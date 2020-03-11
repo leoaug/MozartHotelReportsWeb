@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="chartPorReservaReport" language="groovy" pageWidth="820" pageHeight="555" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="820" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<style name="Crosstab Data Text" isDefault="false" hAlign="Center"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_EMPRESA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select id_empresa, id_reserva, data, qtde from (
+select emp.id_empresa, emp.ID_RESERVA, data, nvl(qtde,0) qtde from
+(select er.id_empresa, r.id_reserva, er.nome_fantasia, data
+from reserva r, reserva_apartamento ra, empresa_rede er, controla_data cd,
+	(select data
+	from table(cast(getdias(to_date($P{P_DATA},'DD/MM/YYYY'),30) as data_objtab))) dias
+where cd.id_hotel = $P{IDH}
+and cd.id_hotel = r.id_hotel
+and cd.id_rede_hotel = er.id_rede_hotel
+and er.id_empresa = r.id_empresa
+and r.ID_RESERVA_BLOQUEIO is null and r.apagada= 'N'
+and ra.id_reserva = r.id_reserva
+and r.id_empresa = $P{P_EMPRESA}
+and (ra.data_entrada between to_date($P{P_DATA},'DD/MM/YYYY') and to_date($P{P_DATA},'DD/MM/YYYY')+30 or
+ra.data_saida between to_date($P{P_DATA},'DD/MM/YYYY') and to_date($P{P_DATA},'DD/MM/YYYY')+30)
+) emp,
+
+(select r.id_empresa, r.id_reserva, rad.data data_entrada, count(rad.data) qtde
+from reserva r, reserva_apartamento_diaria rad
+where r.id_hotel = $P{IDH}
+and r.id_reserva = rad.id_reserva
+and  r.ID_RESERVA_BLOQUEIO is null and r.apagada= 'N'
+and r.id_empresa = $P{P_EMPRESA}
+and rad.data between to_date($P{P_DATA},'DD/MM/YYYY') and to_date($P{P_DATA},'DD/MM/YYYY')+30
+group by  r.id_empresa, r.id_reserva, rad.data) res
+
+where emp.id_empresa = res.id_empresa(+)
+and emp.data = res.data_entrada(+)
+and emp.id_reserva = res.id_reserva(+)
+and emp.id_empresa = $P{P_EMPRESA}
+)
+order by data, id_reserva]]>
+	</queryString>
+	<field name="ID_EMPRESA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_RESERVA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="QTDE" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<sortField name="DATA"/>
+	<sortField name="ID_RESERVA"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="43" splitType="Stretch">
+			<crosstab>
+				<reportElement x="0" y="0" width="820" height="43"/>
+				<rowGroup name="ID_RESERVA" width="65" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.math.BigDecimal"><![CDATA[$F{ID_RESERVA}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="65" height="15"/>
+								<textElement>
+									<font size="7"/>
+								</textElement>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{ID_RESERVA}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="65" height="15"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="7"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="DATA" height="18" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{DATA}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="21" height="18"/>
+								<textElement>
+									<font size="7"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{DATA}.substring(0,10).split("-")[2]+"/"+$V{DATA}.substring(0,10).split("-")[1]]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="1" y="0" width="20" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="7"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="QTDEMeasure" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{QTDE}]]></measureExpression>
+				</measure>
+				<crosstabCell width="21" height="15">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="1" y="0" width="20" height="15"/>
+							<textElement>
+								<font size="7"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{QTDEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="21" height="15" rowTotalGroup="ID_RESERVA">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="1" y="0" width="20" height="15"/>
+							<textElement>
+								<font size="7"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{QTDEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="21" height="15" columnTotalGroup="DATA">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="1" y="0" width="20" height="15"/>
+							<textElement>
+								<font size="7"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{QTDEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="21" height="15" rowTotalGroup="ID_RESERVA" columnTotalGroup="DATA">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="1" y="0" width="20" height="15"/>
+							<textElement>
+								<font size="7"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{QTDEMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="109" y="0" width="711" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

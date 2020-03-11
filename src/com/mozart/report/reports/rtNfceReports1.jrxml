@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rtNfceReports1" pageWidth="340" pageHeight="800" whenNoDataType="NoDataSection" columnWidth="340" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDNOTA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select rownum,pr.id_prato, pr.descricao_prato,to_char(mr.quantidade,'FM999G999D900')quantidade,nu.unidade,TO_CHAR(mr.valor_unitario,'FM999G999D90')vr_unit, to_char(mr.valor_prato,'FM999G999D90')vr_total
+from status_nota sn
+join caixa_ponto_venda cpv on sn.id_nota = cpv.id_nota
+join movimento_restaurante mr on cpv.id_caixa_ponto_venda = mr.id_caixa_ponto_venda
+join prato pr on mr.id_prato = pr.id_prato
+join nfe_unidade nu on pr.id_nfe_unidade = nu.id_nfe_unidade
+where sn.id_nota = $P{IDNOTA}]]>
+	</queryString>
+	<field name="ROWNUM" class="java.math.BigDecimal"/>
+	<field name="ID_PRATO" class="java.math.BigDecimal"/>
+	<field name="DESCRICAO_PRATO" class="java.lang.String"/>
+	<field name="QUANTIDADE" class="java.lang.String"/>
+	<field name="UNIDADE" class="java.lang.String"/>
+	<field name="VR_UNIT" class="java.lang.String"/>
+	<field name="VR_TOTAL" class="java.lang.String"/>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement x="0" y="15" width="340" height="5"/>
+				<textElement>
+					<font size="3"/>
+				</textElement>
+				<text><![CDATA[-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="36" height="13"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="46" y="1" width="50" height="13"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrição]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="163" y="1" width="28" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quant.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="1" width="28" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unid.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="1" width="40" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vr.Unit.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="263" y="1" width="34" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vr.Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="1" width="38" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vr.Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="43" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_PRATO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="46" y="0" width="115" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRICAO_PRATO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="163" y="0" width="25" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTIDADE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="192" y="0" width="28" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UNIDADE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="221" y="0" width="40" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VR_UNIT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="299" y="0" width="38" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="265" y="0" width="32" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VR_UNIT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

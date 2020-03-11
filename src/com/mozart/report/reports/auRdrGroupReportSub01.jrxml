@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RdrReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<style name="DEFAULT" isDefault="true" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="NEGRITO" isDefault="false" mode="Opaque" fontName="SansSerif" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{NEGRITO}]]></conditionExpression>
+			<style isDefault="false" style="NEGRITO" forecolor="#000000" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Relatório Diário de Receita"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT * FROM (
+SELECT  A.RECEITA_CHECKOUT, to_Char(CD.FRONT_OFFICE, 'dd/mm/YYYY')FRONT_OFFICE,
+DECODE(A.RECEITA_CHECKOUT,1,'Total de Receitas','Total de Recebimentos') TITULO_GRUPO,
+G.ACUMULADO_DIA_ANTERIOR, SALDO_MES_ANTERIOR_RDR,
+A.GRUPO, A.SUB_GRUPO, A.DESCRICAO_LANCAMENTO,
+DECODE(A.SUB_GRUPO, 000, H.VALOR_GRUPO_DIA, VALOR_DIA) VALOR_GRUPO_DIA,
+DECODE(A.SUB_GRUPO, 000, I.VALOR_GRUPO_MES, VALOR_MES) VALOR_GRUPO_MES,
+DECODE(A.SUB_GRUPO, 000, I.VALOR_GRUPO_MES, VALOR_MES) / NVL(VD.VALOR_DOLAR,1) VALOR_MES_DOLAR,
+DECODE(VALOR_GRUPO_MES,0,0,( (DECODE(A.SUB_GRUPO, 000, I.VALOR_GRUPO_MES, VALOR_MES) * 100) / DECODE(A.RECEITA_CHECKOUT, 1, E.VALOR_ACUMULADO_RECEITA, F.VALOR_ACUMULADO_RECEBIMENTO) ) )PERCENTUAL,
+ VALOR_DIA_RECEBIMENTO,
+E.VALOR_ACUMULADO_RECEITA, F.VALOR_ACUMULADO_RECEBIMENTO,
+( G.ACUMULADO_DIA_ANTERIOR + VALOR_DIA_RECEITA + VALOR_DIA_RECEBIMENTO ) SALDO_ATUAL_DIA,
+( SALDO_MES_ANTERIOR_RDR   + E.VALOR_ACUMULADO_RECEITA + F.VALOR_ACUMULADO_RECEBIMENTO) SALDO_ATUAL_MES
+FROM
+(SELECT MA.ID_HOTEL, TL.GRUPO_LANCAMENTO GRUPO, TL.SUB_GRUPO_LANCAMENTO SUB_GRUPO, TL.DESCRICAO_LANCAMENTO, IL.RECEITA_CHECKOUT,
+NVL(SUM(MA.VALOR_LANCAMENTO), 0) VALOR_DIA, TL.ID_TIPO_LANCAMENTO
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE MA.ID_TIPO_LANCAMENTO (+)= TL.ID_TIPO_LANCAMENTO
+AND IL.ID_IDENTIFICA_LANCAMENTO = TL.ID_IDENTIFICA_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) = to_date($P{P_DATA},'dd/mm/yyyy')
+GROUP BY MA.ID_HOTEL,TL.GRUPO_LANCAMENTO, TL.SUB_GRUPO_LANCAMENTO,  TL.DESCRICAO_LANCAMENTO, TL.ID_TIPO_LANCAMENTO,IL.RECEITA_CHECKOUT) A,
+(SELECT TL.GRUPO_LANCAMENTO GRUPO, TL.SUB_GRUPO_LANCAMENTO SUB_GRUPO, TL.DESCRICAO_LANCAMENTO,
+NVL(SUM(MA.VALOR_LANCAMENTO), 0) VALOR_MES, TL.ID_TIPO_LANCAMENTO
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'),'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy')
+GROUP BY TL.GRUPO_LANCAMENTO, TL.SUB_GRUPO_LANCAMENTO,  TL.DESCRICAO_LANCAMENTO, TL.ID_TIPO_LANCAMENTO) B,
+(SELECT NVL(SUM(MA.VALOR_LANCAMENTO), 0) VALOR_DIA_RECEITA
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND IL.ID_IDENTIFICA_LANCAMENTO = TL.ID_IDENTIFICA_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND IL.RECEITA_CHECKOUT = 1) C,
+(SELECT NVL(SUM(MA.VALOR_LANCAMENTO), 0) VALOR_DIA_RECEBIMENTO
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND IL.ID_IDENTIFICA_LANCAMENTO = TL.ID_IDENTIFICA_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND IL.RECEITA_CHECKOUT = 2) D,
+(SELECT NVL(SUM(MA.VALOR_LANCAMENTO), 0) VALOR_ACUMULADO_RECEITA
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND IL.ID_IDENTIFICA_LANCAMENTO = TL.ID_IDENTIFICA_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+))  BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'),'MONTH')
+AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND IL.RECEITA_CHECKOUT = 1) E,
+(SELECT NVL(SUM(MA.VALOR_LANCAMENTO), 0) VALOR_ACUMULADO_RECEBIMENTO
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND IL.ID_IDENTIFICA_LANCAMENTO = TL.ID_IDENTIFICA_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'),'MONTH')
+AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND IL.RECEITA_CHECKOUT = 2) F,
+(SELECT SALDO_MES_ANTERIOR_RDR,  DECODE( TO_CHAR(to_date($P{P_DATA},'dd/mm/yyyy'),'DD'), '01', (SALDO_MES_ANTERIOR_RDR),
+(SUM(NVL(VALOR,0)) + SALDO_MES_ANTERIOR_RDR) ) ACUMULADO_DIA_ANTERIOR
+FROM  SALDOS_ESTATISTICOS SE , (SELECT SUM(VALOR_LANCAMENTO) VALOR
+FROM MOVIMENTO_APARTAMENTO
+WHERE TRUNC(DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'),'MONTH') AND (to_date($P{P_DATA},'dd/mm/yyyy')-1)
+AND ID_HOTEL = $P{IDH})
+WHERE SE.MES = TO_CHAR(to_date($P{P_DATA},'dd/mm/yyyy'),'MM')
+AND SE.ANO = TO_CHAR(to_date($P{P_DATA},'dd/mm/yyyy'),'YYYY')
+AND SE.ID_HOTEL =  $P{IDH}
+GROUP BY SALDO_MES_ANTERIOR_RDR,  SE.ANO, SE.MES) G,
+(SELECT Q.GRUPO, NVL(SUM(VALOR), 0) VALOR_GRUPO_DIA FROM
+(SELECT TL.GRUPO_LANCAMENTO GRUPO, TL.SUB_GRUPO_LANCAMENTO,TL.DESCRICAO_LANCAMENTO, SUM(MA.VALOR_LANCAMENTO) VALOR
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) =to_date($P{P_DATA},'dd/mm/yyyy')
+GROUP BY TL.GRUPO_LANCAMENTO, TL.SUB_GRUPO_LANCAMENTO,  TL.DESCRICAO_LANCAMENTO)Q
+GROUP BY Q.GRUPO) H,
+(SELECT N.GRUPO, NVL(SUM(VALOR), 0) VALOR_GRUPO_MES FROM
+(SELECT TL.GRUPO_LANCAMENTO GRUPO, SUM(MA.VALOR_LANCAMENTO)VALOR
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL
+WHERE MA.ID_TIPO_LANCAMENTO(+) = TL.ID_TIPO_LANCAMENTO
+AND MA.ID_HOTEL(+) = $P{IDH}
+AND TL.ID_HOTEL = $P{IDH}
+AND TRUNC(MA.DATA_LANCAMENTO(+)) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'),'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy')
+GROUP BY TL.GRUPO_LANCAMENTO, TL.SUB_GRUPO_LANCAMENTO,  TL.DESCRICAO_LANCAMENTO) N
+GROUP BY N.GRUPO) I,
+(SELECT VALOR_DOLAR FROM VALOR_DOLAR
+WHERE ID_HOTEL = $P{IDH} AND ID_MOEDA = 2
+AND TRUNC(DATA) = to_date($P{P_DATA},'dd/mm/yyyy')) VD, CONTROLA_DATA CD
+WHERE A.ID_TIPO_LANCAMENTO = B.ID_TIPO_LANCAMENTO
+AND CD.ID_HOTEL = $P{IDH}
+AND I.GRUPO = A.GRUPO
+AND I.GRUPO = B.GRUPO
+AND H.GRUPO = A.GRUPO
+AND H.GRUPO = B.GRUPO
+AND (TO_CHAR(A.SUB_GRUPO) LIKE '%'
+OR TO_CHAR(A.RECEITA_CHECKOUT) LIKE '%')
+ORDER BY A.GRUPO, A.SUB_GRUPO)
+WHERE (VALOR_GRUPO_DIA <> 0 OR VALOR_GRUPO_MES <> 0 OR SUB_GRUPO ='000')
+--AND ((SUB_GRUPO <> '000' AND GRUPO = '99') or (RECEITA_CHECKOUT = 1 AND SUB_GRUPO = '000'))]]>
+	</queryString>
+	<field name="RECEITA_CHECKOUT" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TITULO_GRUPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ACUMULADO_DIA_ANTERIOR" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SALDO_MES_ANTERIOR_RDR" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="GRUPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SUB_GRUPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DESCRICAO_LANCAMENTO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_GRUPO_DIA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_GRUPO_MES" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_MES_DOLAR" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="PERCENTUAL" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_DIA_RECEBIMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_ACUMULADO_RECEITA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_ACUMULADO_RECEBIMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SALDO_ATUAL_DIA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SALDO_ATUAL_MES" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="NEGRITO" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{SUB_GRUPO}.equals("000"))]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="PERCENTUAL_SUM" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PERCENTUAL}]]></variableExpression>
+	</variable>
+	<variable name="VALOR_TOTAL_000" class="java.lang.Double" resetType="Group" resetGroup="GrupoReceirtaCheckout" calculation="Sum">
+		<variableExpression><![CDATA[$F{SUB_GRUPO}.equals( "000" )? $F{VALOR_GRUPO_DIA}:new Double(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_GERAL_DIA" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{SUB_GRUPO}.equals( "000" ) ? $F{VALOR_GRUPO_DIA}:new Double(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_GERAL_MES" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{SUB_GRUPO}.equals( "000" ) ? $F{VALOR_GRUPO_MES}:new Double(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="GrupoReceirtaCheckout">
+		<groupExpression><![CDATA[$F{RECEITA_CHECKOUT}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="30">
+				<textField>
+					<reportElement x="61" y="1" width="100" height="13"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{TITULO_GRUPO}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="15" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="2.0"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="0" y="0" width="572" height="1"/>
+				</line>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="357" y="2" width="55" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{RECEITA_CHECKOUT}.equals("1")?$F{VALOR_ACUMULADO_RECEITA}:$F{VALOR_ACUMULADO_RECEBIMENTO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="287" y="2" width="55" height="12"/>
+					<textElement textAlignment="Right">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{VALOR_TOTAL_000}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" x="357" y="17" width="55" height="13">
+						<printWhenExpression><![CDATA[new Boolean($F{RECEITA_CHECKOUT}.equals("2"))]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{TOTAL_GERAL_MES}+$F{SALDO_MES_ANTERIOR_RDR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement isPrintRepeatedValues="false" x="287" y="17" width="55" height="13">
+						<printWhenExpression><![CDATA[new Boolean($F{RECEITA_CHECKOUT}.equals("2"))]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{TOTAL_GERAL_DIA}+$F{ACUMULADO_DIA_ANTERIOR}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement isPrintRepeatedValues="false" x="61" y="17" width="100" height="13">
+						<printWhenExpression><![CDATA[new Boolean($F{RECEITA_CHECKOUT}.equals("2"))]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Saldo Atual]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="75" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="572" height="75"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$F{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="29" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="13" width="573" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="41" height="13"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grupo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="61" y="0" width="127" height="13"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrição]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="0" width="55" height="13"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="357" y="0" width="54" height="13"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Mês]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="0" width="76" height="13"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Mês Dolar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="515" y="0" width="52" height="13"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Percentual]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="61" y="16" width="127" height="13"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saldo anterior]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="287" y="15" width="55" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{ACUMULADO_DIA_ANTERIOR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="357" y="15" width="55" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{SALDO_MES_ANTERIOR_RDR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<textField>
+				<reportElement style="NEGRITO" x="1" y="1" width="14" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="NEGRITO" x="61" y="1" width="127" height="9"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRICAO_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement style="NEGRITO" x="425" y="1" width="75" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{VALOR_MES_DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement style="NEGRITO" x="515" y="1" width="35" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PERCENTUAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement style="NEGRITO" x="357" y="1" width="55" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{VALOR_GRUPO_MES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="NEGRITO" x="27" y="1" width="25" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SUB_GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement style="NEGRITO" x="287" y="1" width="55" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{VALOR_GRUPO_DIA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="556" y="1" width="11" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="487" y="2" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="523" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="541" y="2" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="560" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

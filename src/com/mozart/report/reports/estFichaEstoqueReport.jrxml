@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="estFichaEstoqueReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Ficha de Estoque"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IDITEM" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT UNIQUE (MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE),
+MOVIMENTO_ESTOQUE.DATA_MOVIMENTO,
+MOVIMENTO_ESTOQUE.TIPO_DOCUMENTO,
+MOVIMENTO_ESTOQUE.DATA_DOCUMENTO,
+MOVIMENTO_ESTOQUE.NUM_DOCUMENTO,
+MOVIMENTO_ESTOQUE.SERIE_DOCUMENTO,
+'E' TIPO_MOVIMENTO,
+MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE_PORCAO,
+MOVIMENTO_ESTOQUE.QUANTIDADE,
+MOVIMENTO_ESTOQUE.VALOR_TOTAL,
+SEM.QUANT_ESTOQUE,
+SEM.VALOR_MEDIO,
+NVL(ROUND(ABS(SEM.QUANT_ESTOQUE*SEM.VALOR_MEDIO),2),0)SALDOVRINI,
+MOVIMENTO_ESTOQUE.VALOR_UNITARIO,
+ITEM_REDE.NOME_ITEM,
+U.NOME_UNIDADE_REDUZIDO UND,
+(FORNECEDOR_REDE.NOME_FANTASIA || CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO)Fcc
+FROM MOVIMENTO_ESTOQUE, ITEM_ESTOQUE,ITEM_REDE, FORNECEDOR_REDE, CENTRO_CUSTO_CONTABIL, UNIDADE_ESTOQUE U,SALDOS_ESTOQUE_MENSAL SEM
+WHERE MOVIMENTO_ESTOQUE.ID_HOTEL = $P{IDH}
+AND ITEM_ESTOQUE.ID_HOTEL = MOVIMENTO_ESTOQUE.ID_HOTEL
+AND MOVIMENTO_ESTOQUE.TIPO_MOVIMENTO IN ('E','D')
+AND MOVIMENTO_ESTOQUE.ID_ITEM = ITEM_REDE.ID_ITEM
+AND ITEM_REDE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_REDE_HOTEL = MOVIMENTO_ESTOQUE.ID_REDE_HOTEL
+AND ITEM_REDE.ID_UNIDADE_ESTOQUE = U.ID_UNIDADE_ESTOQUE
+AND MOVIMENTO_ESTOQUE.ID_FORNECEDOR = FORNECEDOR_REDE.ID_FORNECEDOR (+)
+AND MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO = CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL(+)
+AND SEM.ID_ITEM = MOVIMENTO_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_ITEM LIKE $P{IDITEM}
+AND MOVIMENTO_ESTOQUE.ID_REDE_HOTEL = FORNECEDOR_REDE.ID_REDE_HOTEL (+)
+AND SEM.ID_HOTEL = $P{IDH}
+AND ANO =  DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY')-1,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY'))
+AND MES = DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,12,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1)AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+UNION ALL
+SELECT unique (MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE),
+MOVIMENTO_ESTOQUE.DATA_MOVIMENTO,
+MOVIMENTO_ESTOQUE.TIPO_DOCUMENTO,
+MOVIMENTO_ESTOQUE.DATA_DOCUMENTO,
+MOVIMENTO_ESTOQUE.NUM_DOCUMENTO,
+MOVIMENTO_ESTOQUE.SERIE_DOCUMENTO,
+MOVIMENTO_ESTOQUE.TIPO_MOVIMENTO,
+MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE_PORCAO,
+MOVIMENTO_ESTOQUE.QUANTIDADE,
+MOVIMENTO_ESTOQUE.VALOR_TOTAL,
+SEM.QUANT_ESTOQUE,
+SEM.VALOR_MEDIO,
+NVL(ROUND(ABS(SEM.QUANT_ESTOQUE*SEM.VALOR_MEDIO),2),0)SALDOVRINI,
+MOVIMENTO_ESTOQUE.VALOR_UNITARIO,
+ITEM_REDE.NOME_ITEM,
+U.NOME_UNIDADE_REDUZIDO UND,
+(FORNECEDOR_REDE.NOME_FANTASIA || CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO) Fcc
+FROM MOVIMENTO_ESTOQUE, ITEM_ESTOQUE,ITEM_REDE, FORNECEDOR_REDE, CENTRO_CUSTO_CONTABIL, UNIDADE_ESTOQUE U,SALDOS_ESTOQUE_MENSAL SEM
+WHERE MOVIMENTO_ESTOQUE.ID_HOTEL = $P{IDH}
+AND ITEM_ESTOQUE.ID_HOTEL = MOVIMENTO_ESTOQUE.ID_HOTEL
+AND MOVIMENTO_ESTOQUE.TIPO_MOVIMENTO IN ('S')
+AND MOVIMENTO_ESTOQUE.ID_ITEM = ITEM_REDE.ID_ITEM
+AND ITEM_REDE.ID_UNIDADE_ESTOQUE = U.ID_UNIDADE_ESTOQUE
+AND ITEM_REDE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_REDE_HOTEL = MOVIMENTO_ESTOQUE.ID_REDE_HOTEL
+AND MOVIMENTO_ESTOQUE.ID_FORNECEDOR = FORNECEDOR_REDE.ID_FORNECEDOR (+)
+AND MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO = CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL(+)
+AND SEM.ID_ITEM = MOVIMENTO_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_ITEM LIKE $P{IDITEM}
+AND MOVIMENTO_ESTOQUE.ID_REDE_HOTEL = FORNECEDOR_REDE.ID_REDE_HOTEL (+)
+AND SEM.ID_HOTEL = $P{IDH}
+AND ANO =  DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY')-1,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY'))
+AND MES = DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,12,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1)AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+UNION ALL
+SELECT unique (MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE),
+MOVIMENTO_ESTOQUE.DATA_MOVIMENTO,
+MOVIMENTO_ESTOQUE.TIPO_DOCUMENTO,
+MOVIMENTO_ESTOQUE.DATA_DOCUMENTO,
+MOVIMENTO_ESTOQUE.NUM_DOCUMENTO,
+MOVIMENTO_ESTOQUE.SERIE_DOCUMENTO,
+'E' TIPO_MOVIMENTO,
+MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE_PORCAO,
+MOVIMENTO_ESTOQUE.QUANTIDADE,
+MOVIMENTO_ESTOQUE.VALOR_TOTAL,
+SEM.QUANT_ESTOQUE,
+SEM.VALOR_MEDIO,
+NVL(ROUND(ABS(SEM.QUANT_ESTOQUE*SEM.VALOR_MEDIO),2),0)SALDOVRINI,
+MOVIMENTO_ESTOQUE.VALOR_UNITARIO,
+ITEM_REDE.NOME_ITEM,
+U.NOME_UNIDADE_REDUZIDO UND,
+(FORNECEDOR_REDE.NOME_FANTASIA || CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO)Fcc
+FROM MOVIMENTO_ESTOQUE, ITEM_ESTOQUE,ITEM_REDE, FORNECEDOR_REDE, CENTRO_CUSTO_CONTABIL, UNIDADE_ESTOQUE U,SALDOS_ESTOQUE_MENSAL SEM
+WHERE MOVIMENTO_ESTOQUE.ID_HOTEL = $P{IDH}
+AND ITEM_ESTOQUE.ID_HOTEL = MOVIMENTO_ESTOQUE.ID_HOTEL
+AND MOVIMENTO_ESTOQUE.TIPO_MOVIMENTO IN ('P')
+AND MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE_PORCAO IS NOT NULL
+AND MOVIMENTO_ESTOQUE.ID_ITEM = MOVIMENTO_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_REDE_HOTEL = ITEM_ESTOQUE.ID_REDE_HOTEL
+AND ITEM_REDE.ID_UNIDADE_ESTOQUE = U.ID_UNIDADE_ESTOQUE
+AND MOVIMENTO_ESTOQUE.ID_FORNECEDOR = FORNECEDOR_REDE.ID_FORNECEDOR (+)
+AND MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO = CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL(+)
+AND SEM.ID_ITEM = MOVIMENTO_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_ITEM LIKE $P{IDITEM}
+AND MOVIMENTO_ESTOQUE.ID_REDE_HOTEL = FORNECEDOR_REDE.ID_REDE_HOTEL (+)
+AND SEM.ID_HOTEL = $P{IDH}
+AND ANO =  DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY')-1,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY'))
+AND MES = DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,12,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1)AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+UNION ALL
+SELECT unique (MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE),
+MOVIMENTO_ESTOQUE.DATA_MOVIMENTO,
+MOVIMENTO_ESTOQUE.TIPO_DOCUMENTO,
+MOVIMENTO_ESTOQUE.DATA_DOCUMENTO,
+MOVIMENTO_ESTOQUE.NUM_DOCUMENTO,
+MOVIMENTO_ESTOQUE.SERIE_DOCUMENTO,
+'S' TIPO_MOVIMENTO,
+MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE_PORCAO,
+MOVIMENTO_ESTOQUE.QUANTIDADE,
+MOVIMENTO_ESTOQUE.VALOR_TOTAL,
+SEM.QUANT_ESTOQUE,
+SEM.VALOR_MEDIO,
+NVL(ROUND(ABS(SEM.QUANT_ESTOQUE*SEM.VALOR_MEDIO),2),0)SALDOVRINI,
+MOVIMENTO_ESTOQUE.VALOR_UNITARIO,
+ITEM_REDE.NOME_ITEM,
+U.NOME_UNIDADE_REDUZIDO UND,
+(FORNECEDOR_REDE.NOME_FANTASIA || CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO)Fcc
+FROM MOVIMENTO_ESTOQUE, ITEM_ESTOQUE,ITEM_REDE, FORNECEDOR_REDE, CENTRO_CUSTO_CONTABIL, UNIDADE_ESTOQUE U,SALDOS_ESTOQUE_MENSAL SEM
+WHERE MOVIMENTO_ESTOQUE.ID_HOTEL = $P{IDH}
+AND ITEM_ESTOQUE.ID_HOTEL = MOVIMENTO_ESTOQUE.ID_HOTEL
+AND MOVIMENTO_ESTOQUE.TIPO_MOVIMENTO IN ('P')
+AND ITEM_REDE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_REDE_HOTEL = MOVIMENTO_ESTOQUE.ID_REDE_HOTEL
+AND MOVIMENTO_ESTOQUE.ID_MOVIMENTO_ESTOQUE_PORCAO IS NULL
+AND MOVIMENTO_ESTOQUE.ID_ITEM = ITEM_REDE.ID_ITEM
+AND ITEM_REDE.ID_UNIDADE_ESTOQUE = U.ID_UNIDADE_ESTOQUE
+AND MOVIMENTO_ESTOQUE.ID_FORNECEDOR = FORNECEDOR_REDE.ID_FORNECEDOR (+)
+AND MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO = CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL(+)
+AND SEM.ID_ITEM = MOVIMENTO_ESTOQUE.ID_ITEM
+AND ITEM_REDE.ID_ITEM LIKE $P{IDITEM}
+and MOVIMENTO_ESTOQUE.ID_REDE_HOTEL = FORNECEDOR_REDE.ID_REDE_HOTEL (+)
+and SEM.ID_HOTEL = $P{IDH}
+AND ANO =  DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY')-1,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'YYYY'))
+AND MES = DECODE(TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1,0,12,TO_CHAR(to_date($P{P_DATA},'DD/MM/YYYY'),'MM')-1)AND TRUNC(MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC(to_Date($P{P_DATA},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA},'dd/mm/YYYY')
+ORDER BY NOME_ITEM , DATA_MOVIMENTO, NUM_DOCUMENTO, TIPO_MOVIMENTO]]>
+	</queryString>
+	<field name="ID_MOVIMENTO_ESTOQUE" class="java.math.BigDecimal"/>
+	<field name="DATA_MOVIMENTO" class="java.sql.Timestamp"/>
+	<field name="TIPO_DOCUMENTO" class="java.lang.String"/>
+	<field name="DATA_DOCUMENTO" class="java.sql.Timestamp"/>
+	<field name="NUM_DOCUMENTO" class="java.lang.String"/>
+	<field name="SERIE_DOCUMENTO" class="java.lang.String"/>
+	<field name="TIPO_MOVIMENTO" class="java.lang.String"/>
+	<field name="ID_MOVIMENTO_ESTOQUE_PORCAO" class="java.math.BigDecimal"/>
+	<field name="QUANTIDADE" class="java.math.BigDecimal"/>
+	<field name="VALOR_TOTAL" class="java.math.BigDecimal"/>
+	<field name="QUANT_ESTOQUE" class="java.math.BigDecimal"/>
+	<field name="VALOR_MEDIO" class="java.math.BigDecimal"/>
+	<field name="SALDOVRINI" class="java.math.BigDecimal"/>
+	<field name="VALOR_UNITARIO" class="java.math.BigDecimal"/>
+	<field name="NOME_ITEM" class="java.lang.String"/>
+	<field name="UND" class="java.lang.String"/>
+	<field name="FCC" class="java.lang.String"/>
+	<variable name="V_SALDOQT" class="java.lang.Double" resetType="Group" resetGroup="Group ID_ITEM" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIPO_MOVIMENTO}.equals ("S")?$F{QUANTIDADE}*-1:$F{QUANTIDADE}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="V_SALDOVR" class="java.lang.Double" resetType="Group" resetGroup="Group ID_ITEM" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIPO_MOVIMENTO}.equals ("S")?$F{VALOR_TOTAL}*-1:$F{VALOR_TOTAL}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="V_CUSTO_MEDIO" class="java.lang.String"/>
+	<group name="Group ID_ITEM">
+		<groupExpression><![CDATA[$P{IDITEM}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="1">
+				<line>
+					<reportElement x="1" y="0" width="571" height="1"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="-1" width="573" height="70"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="573" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="314" y="1" width="114" height="14"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="1" width="130" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fornecedor/Centro Custo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="1" width="20" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tp.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="1" width="134" height="14"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="255" y="1" width="43" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vr.Unit.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="1" width="54" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="57" y="1" width="35" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Doc.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="1" height="17"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="570" height="1"/>
+			</line>
+			<line>
+				<reportElement x="301" y="0" width="1" height="17"/>
+			</line>
+			<line>
+				<reportElement x="436" y="0" width="1" height="17"/>
+			</line>
+			<line>
+				<reportElement x="572" y="0" width="1" height="17"/>
+			</line>
+			<line>
+				<reportElement x="0" y="16" width="571" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.25" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="342" y="0" width="33" height="13"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saída]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="0" width="45" height="13"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saldo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="302" y="0" width="40" height="13"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entrada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="0" width="45" height="13"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entrada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="0" width="33" height="13"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saída]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="525" y="0" width="43" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saldo]]></text>
+			</staticText>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="367" y="14" width="57" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANT_ESTOQUE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="125" y="12" width="72" height="13"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saldo Inicial]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="13" width="571" height="1"/>
+			</line>
+			<line>
+				<reportElement x="301" y="0" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="572" y="0" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="0" y="25" width="570" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineColor="#000000"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="436" y="0" width="1" height="26"/>
+			</line>
+			<textField pattern="###0.0000;-###0.0000">
+				<reportElement x="255" y="14" width="43" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_MEDIO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="8" y="0" width="146" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_ITEM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="525" y="14" width="43" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALDOVRINI}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12">
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="384" y="0" width="40" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANT_ESTOQUE} + $V{V_SALDOQT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="125" y="0" width="130" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FCC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="347" y="0" width="33" height="11">
+					<printWhenExpression><![CDATA[new Boolean($F{TIPO_MOVIMENTO}.equals("S"))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTIDADE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="493" y="0" width="31" height="11">
+					<printWhenExpression><![CDATA[new Boolean($F{TIPO_MOVIMENTO}.equals("S"))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="3" y="0" width="54" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_MOVIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="310" y="0" width="37" height="11">
+					<printWhenExpression><![CDATA[new Boolean($F{TIPO_MOVIMENTO}.equals("E"))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTIDADE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="101" y="0" width="20" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIPO_DOCUMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="447" y="0" width="37" height="11">
+					<printWhenExpression><![CDATA[new Boolean($F{TIPO_MOVIMENTO}.equals("E"))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.0000;-###0.0000">
+				<reportElement x="255" y="0" width="43" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{SALDOVRINI} + $V{V_SALDOVR})/ ($F{QUANT_ESTOQUE} + $V{V_SALDOQT})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="1" height="11"/>
+			</line>
+			<line>
+				<reportElement x="301" y="0" width="1" height="11"/>
+			</line>
+			<line>
+				<reportElement x="436" y="0" width="1" height="11"/>
+			</line>
+			<line>
+				<reportElement x="572" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement x="0" y="11" width="571" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="525" y="0" width="44" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALDOVRINI} + $V{V_SALDOVR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="58" y="0" width="35" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_DOCUMENTO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<staticText>
+				<reportElement x="491" y="2" width="34" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="2" width="14" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="525" y="2" width="16" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="556" y="2" width="15" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

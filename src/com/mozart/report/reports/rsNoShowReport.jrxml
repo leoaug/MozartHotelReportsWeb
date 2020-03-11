@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="noShowReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["No Show"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT A.NUM_APARTAMENTO, RA.DATA_ENTRADA, RA.DATA_SAIDA, ER.NOME_FANTASIA, ER.CONTATO,
+R.ID_RESERVA, ER.TELEFONE, RA.QTDE_APARTAMENTO
+
+FROM EMPRESA_REDE ER, RESERVA R, RESERVA_APARTAMENTO RA, CONTROLA_DATA CD, APARTAMENTO A, EMPRESA E
+WHERE RA.QTDE_CHECKIN = 0
+
+AND RA.ID_HOTEL = $P{IDH}
+AND RA.DATA_ENTRADA<CD.FRONT_OFFICE
+AND RA.DATA_SAIDA>CD.FRONT_OFFICE
+AND RA.ID_APARTAMENTO = A.ID_APARTAMENTO (+)
+AND RA.ID_RESERVA = R.ID_RESERVA
+AND R.ID_EMPRESA = E.ID_EMPRESA
+AND R.APAGADA = 'N'
+AND CD.ID_HOTEL = RA.ID_HOTEL
+AND ER.ID_REDE_HOTEL = CD.ID_REDE_HOTEL
+AND E.ID_EMPRESA = ER.ID_EMPRESA
+AND to_date($P{P_DATA},'DD/MM/YYYY') between RA.DATA_ENTRADA AND RA.DATA_SAIDA
+
+ORDER BY RA.DATA_ENTRADA]]>
+	</queryString>
+	<field name="NUM_APARTAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_ENTRADA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_SAIDA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NOME_FANTASIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CONTATO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_RESERVA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TELEFONE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="QTDE_APARTAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="-1" width="573" height="70"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="1" width="31" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="1" width="55" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="89" y="1" width="55" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="1" width="142" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Empresa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="1" width="117" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contato]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="1" width="70" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº Reserva]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="1" width="64" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Telefone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="1" width="30" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apart]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="16" width="573" height="1"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="33" y="1" width="55" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="89" y="1" width="55" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_SAIDA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="145" y="1" width="142" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="287" y="1" width="117" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTATO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="404" y="1" width="70" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_RESERVA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="1" width="31" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_APARTAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="475" y="1" width="64" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TELEFONE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="541" y="1" width="30" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTDE_APARTAMENTO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<staticText>
+				<reportElement x="491" y="2" width="34" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="2" width="14" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="525" y="2" width="16" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="556" y="2" width="15" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="2" width="573" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

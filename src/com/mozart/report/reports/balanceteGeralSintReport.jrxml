@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="balanceteGeralSintReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Balancete Geral Sint. - Rede"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="79"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{P_TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="96" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="530" y="1" width="13" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="545" y="1" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="494" y="1" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="559" y="1" width="13" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="50">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="50"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

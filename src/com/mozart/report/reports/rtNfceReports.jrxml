@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rtNfceReports" pageWidth="350" pageHeight="1200" whenNoDataType="NoDataSection" columnWidth="350" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDNOTA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\donin\\OneDrive\\Documents\\Dev\\legado\\MozartHotelReportsWeb\\src\\com\\mozart\\report\\reports\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select h.razao_social, h.cgc,h.insc_estadual, h.endereco||','||h.numero||' - '||h.complemento||' - '|| h.bairro endereco, c.cidade||'/'||UF cidade_uf
+from status_nota sn
+join hotel h on sn.id_hotel = h.id_hotel
+join cidade c on h.id_cidade = c.id_cidade
+join estado e on c.id_estado = e.id_estado
+JOIN caixa_ponto_venda cpv on sn.id_nota = cpv.id_nota
+join movimento_restaurante mr on cpv.id_caixa_ponto_venda = mr.id_caixa_ponto_venda
+where sn.id_nota = $P{IDNOTA}]]>
+	</queryString>
+	<field name="RAZAO_SOCIAL" class="java.lang.String"/>
+	<field name="CGC" class="java.lang.String"/>
+	<field name="INSC_ESTADUAL" class="java.lang.String"/>
+	<field name="ENDERECO" class="java.lang.String"/>
+	<field name="CIDADE_UF" class="java.lang.String"/>
+	<group name="Group Footer 1">
+		<groupExpression><![CDATA[$P{IDNOTA}]]></groupExpression>
+		<groupFooter>
+			<band height="45">
+				<subreport>
+					<reportElement x="1" y="5" width="350" height="39"/>
+					<subreportParameter name="IDNOTA">
+						<subreportParameterExpression><![CDATA[$P{IDNOTA}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "rtNfceReports1.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="56">
+				<subreport>
+					<reportElement x="0" y="5" width="350" height="50"/>
+					<subreportParameter name="IDNOTA">
+						<subreportParameterExpression><![CDATA[$P{IDNOTA}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "rtNfceReports2.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="54">
+				<subreport>
+					<reportElement x="0" y="5" width="350" height="49"/>
+					<subreportParameter name="IDNOTA">
+						<subreportParameterExpression><![CDATA[$P{IDNOTA}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "rtNfceReports3.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="62">
+				<subreport>
+					<reportElement x="0" y="5" width="350" height="50"/>
+					<subreportParameter name="IDNOTA">
+						<subreportParameterExpression><![CDATA[$P{IDNOTA}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "rtNfceReports4.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupFooter>
+	</group>
+	<columnHeader>
+		<band height="78">
+			<textField>
+				<reportElement x="0" y="0" width="350" height="13"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RAZAO_SOCIAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="69" y="26" width="75" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CGC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="13" width="188" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ENDERECO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="188" y="13" width="162" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CIDADE_UF}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="26" width="69" height="13"/>
+				<textElement/>
+				<text><![CDATA[CNPJ:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="39" width="69" height="13"/>
+				<textElement/>
+				<text><![CDATA[Insc. Estadual:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="59" width="350" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[   DOCUMENTO AUXILIAR DA NOTA FISCAL DE CONSUMIDOR ELETRÔNICA]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="54" width="350" height="1"/>
+			</line>
+			<line>
+				<reportElement x="1" y="73" width="350" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="69" y="39" width="75" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{INSC_ESTADUAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+</jasperReport>

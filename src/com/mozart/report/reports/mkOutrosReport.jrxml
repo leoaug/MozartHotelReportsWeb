@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="marketingOutrosReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<style name="Crosstab Data Text" isDefault="false" hAlign="Center"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="FORMA" class="java.lang.String"/>
+	<parameter name="ANO" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Ralatório Forma de Reserva"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT FORMA_RESERVA, TO_CHAR(DATA_ENTRADA, 'MM') "MES", TO_CHAR(DATA_ENTRADA, 'YYYY') ANO,
+COUNT(FORMA_RESERVA) "TOTAL"
+FROM RESERVA
+WHERE ID_HOTEL = $P{IDH}
+AND FORMA_RESERVA LIKE $P{FORMA}
+AND FORMA_RESERVA IS NOT NULL
+AND TO_CHAR(DATA_ENTRADA,'YYYY') = $P{ANO}
+AND DATA_ENTRADA >= to_Date($P{P_DATA},'dd/mm/yyyy')
+AND DATA_SAIDA <= to_Date($P{P_DATA_FIM},'dd/mm/yyyy')
+AND APAGADA = 'N'
+GROUP BY  FORMA_RESERVA, TO_CHAR(DATA_ENTRADA, 'MM'),  TO_CHAR(DATA_ENTRADA, 'YYYY')
+ORDER BY ANO, MES]]>
+	</queryString>
+	<field name="FORMA_RESERVA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ANO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="79"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{P_TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="119" splitType="Stretch">
+			<crosstab>
+				<reportElement x="36" y="0" width="538" height="119"/>
+				<rowGroup name="FORMA_RESERVA" width="70" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{FORMA_RESERVA}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="9" width="70" height="15"/>
+								<textElement>
+									<font size="8" isBold="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{FORMA_RESERVA}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#005FB3" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="110" height="15" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="ANO" width="40" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{ANO}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="15"/>
+								<textElement>
+									<font size="8" isBold="true" isItalic="false"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{ANO}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="40" height="15"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="MES" height="16" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{MES}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{MES}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="28" height="15"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="TOTALMeasure" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{TOTAL}]]></measureExpression>
+				</measure>
+				<crosstabCell width="28" height="16">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="28" height="15" rowTotalGroup="FORMA_RESERVA">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15" forecolor="#FFFFFF"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="28" height="16" columnTotalGroup="MES">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="28" height="15" rowTotalGroup="FORMA_RESERVA" columnTotalGroup="MES">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15" forecolor="#FFFFFF"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="28" height="16" rowTotalGroup="ANO">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="28" height="16" rowTotalGroup="ANO" columnTotalGroup="MES">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="28" height="15"/>
+							<textElement>
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTALMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+	<noData>
+		<band height="40">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="40"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

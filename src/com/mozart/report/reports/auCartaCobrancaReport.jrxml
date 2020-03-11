@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cartaCobrancaReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="NUM_APARTAMENTO" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Carta Cobrança"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT HOTEL.NOME_FANTASIA, APARTAMENTO.NUM_APARTAMENTO, CIDADE.CIDADE, CONTROLA_DATA.FRONT_OFFICE,
+(TRIM(HOSPEDE.NOME_HOSPEDE) || ' ' || TRIM(HOSPEDE.SOBRENOME_HOSPEDE)) HOSPEDE,
+TO_CHAR(CONTROLA_DATA.FRONT_OFFICE, 'Daydd, "de" Month"de" yyyy') DATA_EXTENSO
+FROM APARTAMENTO, CHECKIN, ROOM_LIST, HOTEL, CIDADE, CONTROLA_DATA, HOSPEDE
+WHERE APARTAMENTO.ID_HOTEL = $P{IDH}
+AND APARTAMENTO.NUM_APARTAMENTO = $P{NUM_APARTAMENTO}
+AND APARTAMENTO.ID_APARTAMENTO = CHECKIN.ID_APARTAMENTO
+AND CHECKIN.ID_CHECKIN = ROOM_LIST.ID_CHECKIN
+AND CHECKIN.CHECKOUT = 'N'
+AND ROOM_LIST.ID_HOSPEDE = HOSPEDE.ID_HOSPEDE
+AND HOTEL.ID_HOTEL = APARTAMENTO.ID_HOTEL
+AND HOTEL.ID_CIDADE = CIDADE.ID_CIDADE
+AND CONTROLA_DATA.ID_HOTEL = HOTEL.ID_HOTEL
+GROUP BY HOTEL.NOME_FANTASIA, APARTAMENTO.NUM_APARTAMENTO, CIDADE.CIDADE,
+CONTROLA_DATA.FRONT_OFFICE,HOSPEDE.SOBRENOME_HOSPEDE,HOSPEDE.NOME_HOSPEDE]]>
+	</queryString>
+	<field name="NOME_FANTASIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NUM_APARTAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CIDADE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HOSPEDE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_EXTENSO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<group name="cartaCobrancaGroupReport">
+		<groupExpression><![CDATA[$F{HOSPEDE}]]></groupExpression>
+		<groupHeader>
+			<band height="172">
+				<staticText>
+					<reportElement x="13" y="103" width="61" height="15"/>
+					<textElement textAlignment="Left">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Ao(a) Sr(a)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="13" y="119" width="85" height="15"/>
+					<textElement textAlignment="Left">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Apartamento Nº]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="99" y="119" width="100" height="15"/>
+					<textElement textAlignment="Left">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NUM_APARTAMENTO}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="13" y="154" width="100" height="15"/>
+					<textElement/>
+					<text><![CDATA[Prezado(a) Senhor(a):]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="13" y="81" width="185" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{DATA_EXTENSO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="74" y="103" width="100" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{HOSPEDE}]]></textFieldExpression>
+				</textField>
+				<subreport>
+					<reportElement x="0" y="0" width="573" height="69"/>
+					<subreportParameter name="FRONT_OFFICE">
+						<subreportParameterExpression><![CDATA[$F{FRONT_OFFICE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="P_TITULO">
+						<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="LOGO_HOTEL">
+						<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="LOGO_MOZART">
+						<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="TEXT_FIELD">
+						<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="NOME_HOTEL">
+						<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="DIA"/>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="57">
+				<staticText>
+					<reportElement x="13" y="0" width="100" height="20"/>
+					<textElement/>
+					<text><![CDATA[Atenciosamente,]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="13" y="31" width="155" height="20"/>
+					<textElement textAlignment="Left">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="46" splitType="Stretch">
+			<staticText>
+				<reportElement x="13" y="4" width="527" height="39" isPrintInFirstWholeBand="true"/>
+				<textElement/>
+				<text><![CDATA[Solicitamos seu comparecimento ao nosso caixa na recepção, para tratar de assunto de seu interesse. Nessa
+oportunidade, desejamos que sua estadia seja das mais agradáveis.]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

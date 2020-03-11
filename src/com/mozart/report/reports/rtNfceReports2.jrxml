@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rtNfceReports2" pageWidth="340" pageHeight="800" whenNoDataType="NoDataSection" columnWidth="340" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDNOTA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  count(pr.id_prato)qtde,TO_CHAR(SUM(MR.VALOR_PRATO),'FM999G999D90')Valor_total,nvl(TO_CHAR(sum(mr.valor_taxa_servico),'FM999G999D90'),0)Valor_taxa_servico,
+TO_CHAR(SUM(MR.VALOR_PRATO)+nvl(sum(mr.valor_taxa_servico),0),'FM999G999D90') Valor_pagar,
+decode(tl.id_identifica_lancamento,19,'Cartão de crédito/débito','A vista')
+descricao_lancamento, sum(cpv.valor_nota) valor_nota
+from status_nota sn
+join caixa_ponto_venda cpv on sn.id_nota = cpv.id_nota
+join movimento_restaurante mr on cpv.id_caixa_ponto_venda = mr.id_caixa_ponto_venda
+join prato pr on mr.id_prato = pr.id_prato
+join tipo_lancamento tl on cpv.id_tipo_lancamento = tl.id_tipo_lancamento
+join identifica_lancamento il on tl.id_identifica_lancamento = il.id_identifica_lancamento
+where sn.id_nota = $P{IDNOTA}
+group by tl.id_identifica_lancamento]]>
+	</queryString>
+	<field name="QTDE" class="java.math.BigDecimal"/>
+	<field name="VALOR_TOTAL" class="java.lang.String"/>
+	<field name="VALOR_TAXA_SERVICO" class="java.lang.String"/>
+	<field name="VALOR_PAGAR" class="java.lang.String"/>
+	<field name="DESCRICAO_LANCAMENTO" class="java.lang.String"/>
+	<field name="VALOR_NOTA" class="java.math.BigDecimal"/>
+	<detail>
+		<band height="84">
+			<staticText>
+				<reportElement x="5" y="7" width="100" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Qtd. Total de Itens:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="232" y="7" width="100" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTDE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="20" width="150" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Valor da Taxa de serviço]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;#,##0.00-" isBlankWhenNull="true">
+				<reportElement x="232" y="20" width="100" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_TAXA_SERVICO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="33" width="100" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Valor a Pagar]]></text>
+			</staticText>
+			<textField isBlankWhenNull="false">
+				<reportElement x="232" y="33" width="100" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_PAGAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="5" y="68" width="100" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRICAO_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="232" y="68" width="100" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_NOTA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="55" width="100" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Forma Pagamento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="55" width="100" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Valor pago em R$]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="4" width="340" height="1"/>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

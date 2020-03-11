@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="etiquetaReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT ER.NOME_FANTASIA, ER.ENDERECO_COBRANCA, ER.CEP, C.CIDADE, U.UF
+FROM DUPLICATA D
+JOIN EMPRESA_REDE ER ON (D.ID_EMPRESA = ER.ID_EMPRESA AND D.ID_REDE_HOTEL = ER.ID_REDE_HOTEL)
+JOIN CIDADE C ON (ER.ID_CIDADE = C.ID_CIDADE)
+JOIN EMPRESA E ON (D.ID_EMPRESA = E.ID_EMPRESA)
+JOIN ESTADO U ON (C.ID_ESTADO = U.ID_ESTADO)
+WHERE D.ID_HOTEL = $P{IDH}
+AND D.DATA_LANCAMENTO BETWEEN to_Date($P{P_DATA},'dd/mm/YYYY') AND to_Date($P{P_DATA_FIM},'dd/mm/YYYY')
+AND E.CARTAO_CREDITO = 'N']]>
+	</queryString>
+	<field name="NOME_FANTASIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ENDERECO_COBRANCA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CEP" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CIDADE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="UF" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="200" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="11" y="11" width="173" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="11" y="24" width="173" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENDERECO_COBRANCA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="11" y="37" width="55" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CEP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="66" y="37" width="76" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="147" y="37" width="37" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UF}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="143" y="37" width="4" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

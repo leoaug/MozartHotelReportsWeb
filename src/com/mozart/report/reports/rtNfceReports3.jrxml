@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rtNfceReports3" pageWidth="340" pageHeight="800" whenNoDataType="NoDataSection" columnWidth="340" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.853116706110003"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDNOTA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select 'http://www.fazenda'||'.'||e.uf||'.'||'gov.br/nfce/consulta' consulta, sn.chave_acesso,'Consumidor: '||decode(sn.cpf_cnpj,null,'Não Identificado',sn.cpf_cnpj)Consumidor,
+'NFCe: '||mr.num_nota||' Série: '||pv.serie ||'   Emitida em:' nfce,sn.data_emissao Emissao,'Protocolo de Autorização '||h.aidf aidf,'Data da autorização '||h.aidf_data aidf_data, pv.orgao_1,pv.orgao_2,'Trib. aprox.: '||h.impostos_mercadorias||' %' Impostos
+from status_nota sn
+join hotel h on sn.id_hotel = h.id_hotel
+join cidade c on h.id_cidade = c.id_cidade
+join estado e on c.id_estado = e.id_estado
+JOIN caixa_ponto_venda cpv on sn.id_nota = cpv.id_nota
+join movimento_restaurante mr on cpv.id_caixa_ponto_venda = mr.id_caixa_ponto_venda
+join ponto_venda pv on mr.id_ponto_venda = pv.id_ponto_venda
+where sn.id_nota = $P{IDNOTA}
+GROUP BY E.UF,SN.CHAVE_ACESSO,sn.cpf_cnpj,mr.num_nota,pv.serie,sn.data_emissao,h.aidf,h.aidf_data,pv.orgao_1,pv.orgao_2,h.impostos_mercadorias]]>
+	</queryString>
+	<field name="CONSULTA" class="java.lang.String"/>
+	<field name="CHAVE_ACESSO" class="java.lang.String"/>
+	<field name="CONSUMIDOR" class="java.lang.String"/>
+	<field name="NFCE" class="java.lang.String"/>
+	<field name="EMISSAO" class="java.sql.Timestamp"/>
+	<field name="AIDF" class="java.lang.String"/>
+	<field name="AIDF_DATA" class="java.lang.String"/>
+	<field name="ORGAO_1" class="java.lang.String"/>
+	<field name="ORGAO_2" class="java.lang.String"/>
+	<field name="IMPOSTOS" class="java.lang.String"/>
+	<detail>
+		<band height="151" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="16" width="340" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Consulte pela Chave de Acesso em]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="29" width="340" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONSULTA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="42" width="340" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHAVE_ACESSO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="55" width="340" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONSUMIDOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="110" width="340" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IMPOSTOS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="123" width="340" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGAO_1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="136" width="340" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGAO_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="82" width="154" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NFCE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="168" y="82" width="104" height="13"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMISSAO}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="11" width="340" height="1"/>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

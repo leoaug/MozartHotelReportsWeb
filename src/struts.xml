@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="default" namespace="/" extends="jasperreports-default">
+		<action name="reportAction" method="showReport" class="com.mozart.report.actions.AuditoriaReportAction">
+
+			<result name="saldosContasSinteticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auSaldosContasSinteticoGroupReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="saldosContasAnaliticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auSaldosContasAnaliticoGroupReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-saldosContasAnalitico</param>
+				
+			</result>
+			<result name="notaHospedagemReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auNotasHospedagemReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+			<result name="RPSReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auRPSReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+			<result name="noShowReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rsNoShowReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+			<result name="rdrReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auRdrGroupReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="potencialDiariaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auPotencialdeDiariasGrupoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="empresaCreditoDetalheReport" type="jasper">
+				<param name="location">/WEB-INF/reports/emrdEmpresaCreditoDetalheReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+
+			<result name="rdsReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auRdsReportGrupo.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="fnrhReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ckFnrhReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="recebimentosCartaoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auRecebimentosCartaoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="controlaDataReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rdControlaDataReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="AptoTransferidoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auAptoTransferidoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="movimentacaoReservasReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rsMovimentacaoReservasReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-movimentacaoReservas</param>
+			</result>
+
+			<result name="cartaCobrancaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auCartaCobrancaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="reservasCanceladasReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rsReservasCanceladasReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="tarifasExpiradasReport" type="jasper">
+				<param name="location">/WEB-INF/reports/emTarifasExpiradasReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="aptoPorAreaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/gvAptoPorAreaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="ultimaMovimentacaoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/emUltimaMovimentacaoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="reservasAptoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rsReservasAptoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="avisoSaidaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/gvAvisoSaidaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="avisodeEntradaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/gvAvisoEntradaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="reservasChartEmpresaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rsChartEmpresaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="chartPorReservaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rsChartPorReservaGroupReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="caixaUsuarioReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cxCaixaUsuarioGrupoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="percentualDeOcupacaoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkPercentualDeOcupacaoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="notasEmitidasReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auNotasEmitidasReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="geralPorAptoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/gvGeralPorApartamento.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="tarifasReport" type="jasper">
+				<param name="location">/WEB-INF/reports/trTarifasReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="comprovanteAjusteReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auComprovanteAjusteReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="duplicataReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ftDuplicataReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="duplicataInglesReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ftDuplicataInglesReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="faturamentoGroupReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ftFaturamentoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="etiquetaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ftEtiquetaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="faturamentoContabilGroupReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ftFaturamentoContabilGroupReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="borderauxBancariaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ftBorderauxBancariaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="bancoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/crBancoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="fluxoCaixaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/crFluxoCaixaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpFluxoCaixaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpFluxoCaixaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="tituloEmAbertoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/crTituloEmAbertoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="contabilReport" type="jasper">
+				<param name="location">/WEB-INF/reports/crContabilReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="detalheCheckinReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ckCheckinReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="fnrhVazioReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auFnrhVazioReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="rdsAnualReport" type="jasper">
+				<param name="location">/WEB-INF/reports/rdsAnualReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="empresaRoomNightReport" type="jasper">
+				<param name="location">/WEB-INF/reports/emRoomNightReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+
+			<result name="boletimCaixaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsBoletimCaixaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="conciliacaoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsConciliacaoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="fluxoCaixaAnaliticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsFluxoCaixaAnaliticoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="fluxoCaixaTipoForReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsTipoForReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="fluxoCaixaSinteticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsFluxoCaixaSinteticoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="razaoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsRazaoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="balanceteFinanceiroAnaliticoPorDataReport" type="jasper">
+				<param name="location">/WEB-INF/reports/tsBalanceteFinanceiroAnaliticoPorDataReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="diarioReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctDiarioReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="razaoContabilidadeReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctRazaoContabilidadeReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="razaoPorCnpjReport" type="jasper">
+				<param name="location">/WEB-INF/reports/razaoPorCnpjReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="totalizacaoLoteReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctTotalizacaoLoteReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="balanceteRedeContabilidadeReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctBalanceteRedeContabilidadeReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="balancoPatrimonialRedeReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctBalancoPatrimonialRedeReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="balanceteGeralSintRedeReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctBalanceteGeralSintRedeReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+
+			<result name="marketingEmpresaDiariaTotalReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkEmpresaDiariaTotalReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingEmpresaGeralReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkEmpresaGeralReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingEmpresaPorDespesaTotalReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkEmpresaPorDespesaTotalReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingEmpresaPorDiariaMediaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkEmpresaPorDiariaMediaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingEmpresaRoomNightReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkEmpresaRoomNightReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingFormaReservaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkFormaReservaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingMeioTransporteReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkMeioTransporteReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingMotivoViagemReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkMotivoViagemReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="tipoMidiaReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkTipoMidiaReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="marketingOutrosReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkOutrosReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+
+			<result name="marketingPromotorRoomNightReport" type="jasper">
+				<param name="location">/WEB-INF/reports/mkPromotorRoomNightReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="demoResultadoGeralMensalReport" type="jasper">
+				<param name="location">/WEB-INF/reports/dmResultadoGeralMensalReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="relDemonstrativoResultadoMesesReport" type="jasper">
+				<param name="location">/WEB-INF/reports/dmResultadoMesesReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpBancoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpBancoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpChequesEmitidosReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpChequesEmitidosReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+
+			<result name="ckHospedeSeguradoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ckHospedeSeguradoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpContabilReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpContabilReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpClassContabilReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpClassContabilReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpCopiaChequeReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpCopiaChequeReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpDataVencimentoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpDataVencimentoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpDataVencimentoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpDataVencimentoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpClassContabilReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpClassContabilReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="cpFluxoCaixaGrupoFornecedorReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cpFluxoCaixaGrupoFornecedorReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">PDF</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+			</result>
+
+			<result name="estContabilReport" type="jasper">
+				<param name="location">/WEB-INF/reports/estContabilReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-EstoqueContabil</param>
+			</result>
+			<result name="estFichaEstoqueReport" type="jasper">
+				<param name="location">/WEB-INF/reports/estFichaEstoqueReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-FichaEstoque</param>
+			</result>
+			<result name="estInventarioDespesaSinteticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/estInventarioDespesaSinteticoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-InventarioDespesaSintetico</param>
+			</result>
+			<result name="estInventarioDespesaAnaliticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/estInventarioDespesaAnaliticoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-InventarioDespesaAnalitico</param>
+			</result>
+			<result name="estInventarioAtivoAnaliticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/estInventarioAtivoAnaliticoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-InventarioAtivoAnalitico</param>
+			</result>
+			<result name="estInventarioAtivoSinteticoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/estInventarioAtivoSinteticoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-InventarioAtivoSintetico</param>
+			</result>
+
+			<result name="custoGeralReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cusGeralReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-custoGeral</param>
+			</result>
+			
+			<result name="recebimentosFaturamentoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auRecebimentosFaturamentoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="contentDisposition">attachment</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="fieldDelimiter">;</param>
+				<param name="documentName">${parametros['P_DATA']}-RecebimentosFaturamento</param>
+			</result>
+			
+			<result name="recebimentosGeralReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auRecebimentosGeralReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="contentDisposition">attachment</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="fieldDelimiter">;</param>
+				<param name="documentName">${parametros['P_DATA']}-RecebimentosGeral</param>
+			</result>
+
+			<result name="contasPagarReport" type="jasper">
+				<param name="location">/WEB-INF/reports/auContasPagarReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="contentDisposition">attachment</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="fieldDelimiter">;</param>
+				<param name="documentName">${parametros['P_DATA']}-ContasPagar</param>
+			</result>
+			
+			<result name="custoInventarioPdvReport" type="jasper">
+				<param name="location">/WEB-INF/reports/cusInventarioPdvReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-custoInventarioPdv</param>
+			</result>
+			
+			<result name="controleAtivoFixoReport" type="jasper">
+				<param name="location">/WEB-INF/reports/ctControleAtivoFixoReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-controleAtivoFixo</param>
+			</result>
+			
+			<result name="cxExtratoPdvReport" type="jasper">
+				<param name="location">/WEB-INF/reports/CxExtratoPdvReport.jasper</param>
+				<param name="dataSource">myList</param>
+				<param name="format">${format}</param>
+				<param name="reportParameters">parametros</param>
+				<param name="connection">conexao</param>
+				<param name="bufferSize">1024</param>
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="documentName">${parametros['P_DATA']}-extratoPdvReport</param>
+			</result>
+
+		</action>
+	</package>
+
+</struts>

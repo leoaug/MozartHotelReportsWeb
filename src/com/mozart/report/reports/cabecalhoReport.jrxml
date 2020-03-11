@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cabecalhoReport" language="groovy" pageWidth="574" pageHeight="842" columnWidth="574" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="DIA" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="P_TITULO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select 1 tipo from dual]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="72" splitType="Stretch">
+			<textField>
+				<reportElement x="81" y="62" width="420" height="9" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="6" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{TEXT_FIELD}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Right">
+				<reportElement x="473" y="0" width="101" height="48"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{LOGO_HOTEL}]]></imageExpression>
+				<anchorNameExpression><![CDATA[$P{LOGO_HOTEL}]]></anchorNameExpression>
+			</image>
+			<textField>
+				<reportElement x="284" y="33" width="59" height="13" forecolor="#000066">
+					<printWhenExpression><![CDATA[new Boolean($P{DIA}!=null)]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm:ss">
+				<reportElement x="358" y="47" width="112" height="13" forecolor="#000066"/>
+				<textElement textAlignment="Left" markup="none">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="101" height="48"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{LOGO_MOZART}]]></imageExpression>
+				<anchorNameExpression><![CDATA[$P{LOGO_MOZART}]]></anchorNameExpression>
+			</image>
+			<staticText>
+				<reportElement x="292" y="47" width="65" height="13" forecolor="#000066"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Emissão:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="47" width="63" height="13" forecolor="#000066">
+					<printWhenExpression><![CDATA[new Boolean($P{FRONT_OFFICE}!=null)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Front Office:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="263" y="33" width="20" height="13" forecolor="#000066">
+					<printWhenExpression><![CDATA[new Boolean($P{DIA}!=null)]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Dia:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="188" y="2" width="221" height="16" forecolor="#000099"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" lineSpacing="Single" markup="none">
+					<font fontName="DejaVu Serif" size="12" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{NOME_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="188" y="18" width="221" height="15" forecolor="#000066"/>
+				<textElement textAlignment="Center" markup="none">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{P_TITULO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="223" y="47" width="61" height="13" forecolor="#000066">
+					<printWhenExpression><![CDATA[new Boolean($P{FRONT_OFFICE}!=null)]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{FRONT_OFFICE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

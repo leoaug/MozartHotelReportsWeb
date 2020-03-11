@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="aptoTransferidosDespesasReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT INITCAP(APARTAMENTO_TRANSFERIDO.MOTIVO) MOTIVO, APARTAMENTO_TRANSFERIDO.DATA, APARTAMENTO_TRANSFERIDO.HORA,
+APARTAMENTO.NUM_APARTAMENTO DESTINO, APARTAMENTO_ORIGEM.NUM_APARTAMENTO ORIGEM,
+INITCAP(RTRIM(MIN(HOSPEDE.SOBRENOME_HOSPEDE))) || '/' || INITCAP(RTRIM(MIN(HOSPEDE.NOME_HOSPEDE))) HOSPEDE,
+INITCAP(SUBSTR(USUARIO.NICK, 8 , LENGTH(USUARIO.NICK))) NICK, CONTROLA_DATA.FRONT_OFFICE, INITCAP(TIPO_TRANSFERENCIA)TIPO_TRANSFERENCIA,
+APARTAMENTO_TRANSFERIDO.VALOR_LANCAMENTO
+FROM APARTAMENTO_TRANSFERIDO, APARTAMENTO, ROOM_LIST, LOG_USUARIO, USUARIO, CONTROLA_DATA, HOSPEDE,
+(SELECT id_apartamento, num_apartamento
+FROM APARTAMENTO
+WHERE APARTAMENTO.ID_HOTEL = $P{IDH}) APARTAMENTO_ORIGEM
+
+WHERE APARTAMENTO_TRANSFERIDO.DATA >= to_Date( $P{P_DATA},'dd/mm/yyyy')
+AND APARTAMENTO_TRANSFERIDO.DATA <= to_Date( $P{P_DATA_FIM},'dd/mm/yyyy')
+
+AND APARTAMENTO_ORIGEM.ID_APARTAMENTO = APARTAMENTO_TRANSFERIDO.ID_APARTAMENTO_ORIGEM
+
+AND APARTAMENTO_TRANSFERIDO.ID_APARTAMENTO_DESTINO = APARTAMENTO.ID_APARTAMENTO
+AND APARTAMENTO_TRANSFERIDO.ID_CHECKIN = ROOM_LIST.ID_CHECKIN
+AND APARTAMENTO_TRANSFERIDO.ID_HOTEL = $P{IDH}
+
+AND APARTAMENTO_TRANSFERIDO.ID_APARTAMENTO_TRANSFERIDO = LOG_USUARIO.ID_AUDITADO
+AND LOG_USUARIO.ID_USUARIO = USUARIO.ID_USUARIO
+AND CONTROLA_DATA.ID_HOTEL = APARTAMENTO.ID_HOTEL
+AND ROOM_LIST.ID_HOSPEDE = HOSPEDE.ID_HOSPEDE
+AND LOG_USUARIO.OPERACAO='Inclusão'
+
+GROUP BY APARTAMENTO_TRANSFERIDO.MOTIVO, APARTAMENTO_TRANSFERIDO.DATA,
+APARTAMENTO_TRANSFERIDO.HORA, APARTAMENTO.NUM_APARTAMENTO,
+APARTAMENTO_ORIGEM.NUM_APARTAMENTO, HOSPEDE.SOBRENOME_HOSPEDE,
+HOSPEDE.NOME_HOSPEDE, USUARIO.NICK, CONTROLA_DATA.FRONT_OFFICE,
+TIPO_TRANSFERENCIA, APARTAMENTO_TRANSFERIDO.VALOR_LANCAMENTO
+ORDER BY APARTAMENTO_TRANSFERIDO.DATA]]>
+	</queryString>
+	<field name="MOTIVO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HORA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DESTINO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ORIGEM" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HOSPEDE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NICK" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TIPO_TRANSFERENCIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_LANCAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="108" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="129" height="57"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{LOGO_MOZART}]]></imageExpression>
+			</image>
+			<image hAlign="Right">
+				<reportElement x="426" y="0" width="129" height="57"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{LOGO_HOTEL}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="176" y="10" width="202" height="20" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{NOME_HOTEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="163" y="32" width="229" height="22" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apartamento Transferidos / Despesas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="161" y="75" width="39" height="11" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Hotel:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="201" y="75" width="82" height="11" forecolor="#000066"/>
+				<textElement textAlignment="Left">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{FRONT_OFFICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="339" y="75" width="77" height="11" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="284" y="75" width="55" height="11" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data emissão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="256" y="55" width="100" height="13" forecolor="#000066"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{P_DATA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="236" y="55" width="20" height="13" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dia:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="123" y="87" width="311" height="12" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{TEXT_FIELD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="61" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apto. Origem]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="0" width="61" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apto. Atual]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="0" width="80" height="14"/>
+				<textElement textAlignment="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome Hóspede]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="205" y="0" width="103" height="14"/>
+				<textElement textAlignment="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Motivo Transferência]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="309" y="0" width="56" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="0" width="27" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="393" y="0" width="62" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="0" width="42" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hora]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="497" y="0" width="58" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usuário]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="14" width="555" height="1"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement x="124" y="0" width="80" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="63" y="0" width="60" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{DESTINO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="61" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ORIGEM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="205" y="0" width="104" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{MOTIVO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="309" y="0" width="56" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{VALOR_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="365" y="0" width="27" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TIPO_TRANSFERENCIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="393" y="0" width="62" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{DATA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm">
+				<reportElement x="455" y="0" width="42" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{HORA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="497" y="0" width="58" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NICK}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="13" splitType="Stretch">
+			<staticText>
+				<reportElement x="458" y="1" width="32" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="490" y="1" width="20" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="510" y="1" width="22" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="1" width="22" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

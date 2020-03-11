@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tarifasExperidasReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Tarifas Expiradas"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT  EM.ID_EMPRESA,EM.NOME_FANTASIA,ER.TELEFONE,ER.FAX,ER.CONTATO,EM.CGC,MAX(TA.DATA_ENTRADA)DATA_ENTRADA,TA.DATA_SAIDA,
+     TA.DESCRICAO,CD.FRONT_OFFICE,EM.TIPO
+
+FROM EMPRESA EM, RESERVA RE, TARIFA TA, EMPRESA_TARIFA ET, EMPRESA_HOTEL EH , CONTROLA_DATA CD, EMPRESA_REDE ER
+
+WHERE TA.TIPO = 'A'
+AND CD.FRONT_OFFICE > TA.DATA_SAIDA
+AND EH.ID_HOTEL =$P{IDH}
+AND RE.ID_HOTEL = EH.ID_HOTEL
+AND EM.ID_EMPRESA = ER.ID_EMPRESA
+AND TA.ID_HOTEL = EH.ID_HOTEL
+AND ET.ID_HOTEL = EH.ID_HOTEL
+AND EH.ID_HOTEL = EH.ID_HOTEL
+AND CD.ID_HOTEL = EH.ID_HOTEL
+AND EM.ID_EMPRESA = RE.ID_EMPRESA
+AND EM.ID_EMPRESA = EH.ID_EMPRESA
+AND EM.ID_EMPRESA = ET.ID_EMPRESA
+AND ET.ID_TARIFA = TA.ID_TARIFA
+AND RE.DATA_ENTRADA between to_date($P{P_DATA},'DD/MM/YYYY') and to_date($P{P_DATA_FIM},'DD/MM/YYYY')
+
+GROUP BY EM.ID_EMPRESA,EM.NOME_FANTASIA,ER.TELEFONE,ER.FAX,ER.CONTATO,EM.CGC,TA.DATA_SAIDA,
+         TA.DESCRICAO,CD.FRONT_OFFICE, EM.TIPO
+ORDER BY TA.DATA_SAIDA]]>
+	</queryString>
+	<field name="ID_EMPRESA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NOME_FANTASIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TELEFONE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FAX" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CONTATO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CGC" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_ENTRADA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_SAIDA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DESCRICAO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TIPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="71" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="71"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="76" y="1" width="75" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Telefone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="157" y="1" width="61" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fax]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="224" y="1" width="61" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contato]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="1" width="66" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CNPJ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="358" y="1" width="53" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="1" width="62" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrição]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="14" width="573" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="1" width="67" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Empresa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="417" y="1" width="53" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="538" y="1" width="35" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="9" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="70" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="76" y="0" width="75" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TELEFONE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="157" y="0" width="61" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{FAX}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="224" y="0" width="61" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CONTATO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="287" y="0" width="66" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CGC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="475" y="0" width="62" height="9"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRICAO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="538" y="0" width="34" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TIPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="358" y="0" width="53" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{DATA_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="419" y="0" width="51" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{DATA_SAIDA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<staticText>
+				<reportElement x="491" y="2" width="34" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="2" width="14" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="525" y="2" width="16" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="556" y="2" width="15" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="1" width="572" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="3" y="0" width="570" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="razaoReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDHS" class="java.lang.String"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_CC" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Razão Tesouraria"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1 TIPO, SIGLA, CONTA_REDUZIDA, CONTA_CORRENTE, DATA_LANCAMENTO, VALOR_LANC, DEBITO_CREDITO, NOME_CONTA, HISTORICO, COMPLEMENTO_HISTORICO, DATA_CONCILIADO,
+SUBSTR(SALDO_INICIAL,1, INSTR(SALDO_INICIAL,'-')-1)+0 SALDO_INICIAL,
+SUBSTR(SALDO_INICIAL,INSTR(SALDO_INICIAL,'-')+1)  SALDO_DEBITO_CREDITO
+
+FROM(
+SELECT HOTEL.SIGLA, PLANO_CONTAS.CONTA_REDUZIDA, PLANO_CONTAS.NOME_CONTA, TESOURARIA.COMPLEMENTO_HISTORICO, TESOURARIA.DEBITO_CREDITO,
+TESOURARIA.DATA_LANCAMENTO, to_Char(TESOURARIA.DATA_CONCILIADO,'dd/mm/yyyy') DATA_CONCILIADO, BANCO.BANCO, HISTORICO_CONTABIL.HISTORICO,
+BANCO.NOME_FANTASIA||'-'|| CONTA_CORRENTE.NUM_CONTA_CORRENTE CONTA_CORRENTE, TESOURARIA.VALOR  VALOR_LANC,
+
+
+(SELECT SALDO||'-'||DEBITO_CREDITO FROM TABLE(CAST(FC_SALDO_CONTA_CORRENTE(hotel.id_hotel, CONTA_CORRENTE.ID_CONTA_CORRENTE,
+TRUNC(TO_DATE($P{P_DATA},'DD/MM/YYYY'),'MONTH')-1)AS SALDO_CONTA_SET))) SALDO_INICIAL
+
+FROM TESOURARIA, PLANO_CONTAS, BANCO, CONTA_CORRENTE, HISTORICO_CONTABIL, HOTEL
+
+WHERE instr(NVL($P{IDHS},','||TESOURARIA.id_hotel||','), ','||TESOURARIA.id_hotel||',' ) >= 1
+
+AND TESOURARIA.ID_PLANO_CONTAS = PLANO_CONTAS.ID_PLANO_CONTAS
+AND HOTEL.ID_HOTEL = TESOURARIA.ID_HOTEL
+AND PLANO_CONTAS.ID_REDE_HOTEL = HOTEL.ID_REDE_HOTEL
+AND CONTA_CORRENTE.ID_HOTEL = TESOURARIA.ID_HOTEL
+AND HISTORICO_CONTABIL.ID_REDE_HOTEL = HOTEL.ID_REDE_HOTEL
+AND (CONTA_CORRENTE.ID_CONTABIL_REC = PLANO_CONTAS.ID_PLANO_CONTAS
+OR 	CONTA_CORRENTE.ID_CONTABIL_PAG = PLANO_CONTAS.ID_PLANO_CONTAS)
+AND BANCO.ID_BANCO = CONTA_CORRENTE.ID_BANCO
+AND CONTA_CORRENTE.ID_CONTA_CORRENTE LIKE $P{P_CC}
+AND TESOURARIA.ID_CONTA_CORRENTE = CONTA_CORRENTE.ID_CONTA_CORRENTE
+AND TRUNC(TESOURARIA.DATA_LANCAMENTO) BETWEEN to_Date($P{P_DATA},'dd/mm/yyyy') AND to_Date($P{P_DATA_FIM},'dd/mm/yyyy')
+AND TESOURARIA.ID_HISTORICO = HISTORICO_CONTABIL.ID_HISTORICO
+AND TESOURARIA.VALOR <> 0
+ORDER BY HOTEL.SIGLA, PLANO_CONTAS.CONTA_REDUZIDA, TESOURARIA.DATA_LANCAMENTO
+)]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal"/>
+	<field name="SIGLA" class="java.lang.String"/>
+	<field name="CONTA_REDUZIDA" class="java.lang.String"/>
+	<field name="CONTA_CORRENTE" class="java.lang.String"/>
+	<field name="DATA_LANCAMENTO" class="java.sql.Timestamp"/>
+	<field name="VALOR_LANC" class="java.math.BigDecimal"/>
+	<field name="DEBITO_CREDITO" class="java.lang.String"/>
+	<field name="NOME_CONTA" class="java.lang.String"/>
+	<field name="HISTORICO" class="java.lang.String"/>
+	<field name="COMPLEMENTO_HISTORICO" class="java.lang.String"/>
+	<field name="DATA_CONCILIADO" class="java.lang.String"/>
+	<field name="SALDO_INICIAL" class="java.math.BigDecimal"/>
+	<field name="SALDO_DEBITO_CREDITO" class="java.lang.String"/>
+	<variable name="V_SALDO_ATUAL" class="java.lang.Double" resetType="Group" resetGroup="CONTA_GROUP" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBITO_CREDITO}.equals("D")?$F{VALOR_LANC}*-1:$F{VALOR_LANC}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{SALDO_INICIAL}]]></initialValueExpression>
+	</variable>
+	<group name="GRUPO_SIGLA" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{SIGLA}]]></groupExpression>
+	</group>
+	<group name="CONTA_GROUP">
+		<groupExpression><![CDATA[$F{CONTA_REDUZIDA}]]></groupExpression>
+		<groupHeader>
+			<band height="31">
+				<line>
+					<reportElement x="0" y="29" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="42" y="14" width="75" height="14"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Conta Contábil:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="118" y="14" width="70" height="14"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{CONTA_REDUZIDA}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="188" y="14" width="35" height="14"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Banco:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="223" y="14" width="130" height="14"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{CONTA_CORRENTE}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="357" y="14" width="79" height="14"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Saldo anterior:]]></text>
+				</staticText>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="450" y="14" width="50" height="14"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALDO_INICIAL}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="501" y="14" width="20" height="14"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALDO_DEBITO_CREDITO}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="11" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="1" y="14" width="41" height="14"/>
+					<textElement textAlignment="Left">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Sigla]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="79"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{P_TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement x="394" y="5" width="55" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRÉDITO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="42" y="5" width="62" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATA LANÇ.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="5" width="110" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[HISTÓRICO PADRÃO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="219" y="5" width="120" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMPLEM. HIST.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="339" y="5" width="55" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DÉBITO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="450" y="5" width="50" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SALDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="501" y="5" width="20" height="14"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[D/C]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="522" y="5" width="50" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CONC.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="21" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="42" y="0" width="62" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="107" y="0" width="110" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HISTORICO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="219" y="0" width="120" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPLEMENTO_HISTORICO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="339" y="0" width="55" height="11">
+					<printWhenExpression><![CDATA[new Boolean($F{DEBITO_CREDITO}.equals("D"))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_LANC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="394" y="0" width="55" height="11">
+					<printWhenExpression><![CDATA[new Boolean($F{DEBITO_CREDITO}.equals("C"))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_LANC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="522" y="0" width="50" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_CONCILIADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="450" y="0" width="50" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_SALDO_ATUAL}+($F{SALDO_DEBITO_CREDITO}.equals("D")?$F{SALDO_INICIAL}*-1:$F{SALDO_INICIAL})<0?
+($V{V_SALDO_ATUAL}+($F{SALDO_DEBITO_CREDITO}.equals("D")?$F{SALDO_INICIAL}*-1:$F{SALDO_INICIAL}))*-1:
+$V{V_SALDO_ATUAL}+($F{SALDO_DEBITO_CREDITO}.equals("D")?$F{SALDO_INICIAL}*-1:$F{SALDO_INICIAL})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="501" y="0" width="20" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_SALDO_ATUAL}+($F{SALDO_DEBITO_CREDITO}.equals("D")?$F{SALDO_INICIAL}*-1:$F{SALDO_INICIAL})<0?"D":"C"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="41" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SIGLA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="2" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="545" y="3" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="559" y="3" width="13" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="530" y="3" width="13" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="494" y="3" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="50">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="50"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

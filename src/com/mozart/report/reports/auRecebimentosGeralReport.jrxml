@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RecebimentosGeralReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.csv.field.delimiter" value=";"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<style name="DEFAULT" isDefault="true" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="IDH" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT MOV.DATA_LANCAMENTO DATA_VENDA
+                      ,H.NOME_FANTASIA
+                      ,TL.DESCRICAO_LANCAMENTO
+                      ,MAX(MOV.ID_MOVIMENTO_APARTAMENTO) ID_MOVIMENTO
+                      ,SUM(MOV.VALOR_LANCAMENTO*-1) VALOR_BRUTO
+                      --,TO_CHAR(SUM(MOV.VALOR_LANCAMENTO*-1),'FM999999999D90') VALOR_BRUTO
+                 FROM CHECKIN C
+                     JOIN APARTAMENTO A ON (C.ID_HOTEL = A.ID_HOTEL AND C.ID_APARTAMENTO = A.ID_APARTAMENTO)
+                     JOIN MOVIMENTO_APARTAMENTO MOV ON (C.ID_CHECKIN = MOV.ID_CHECKIN AND MOV.ID_HOTEL = C.ID_HOTEL)
+                     JOIN TIPO_LANCAMENTO TL ON (MOV.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO AND MOV.ID_HOTEL = TL.ID_HOTEL)
+                     JOIN IDENTIFICA_LANCAMENTO IL ON (TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO)
+                     JOIN HOTEL H ON (H.ID_HOTEL = A.ID_HOTEL AND MOV.ID_HOTEL = A.ID_HOTEL)
+               WHERE H.ID_HOTEL = $P{IDH}
+                     AND TL.ID_IDENTIFICA_LANCAMENTO  IN (16,17,20,24)
+                    AND TRUNC(MOV.DATA_LANCAMENTO) BETWEEN  TO_DATE($P{P_DATA},'DD/MM/YYYY') AND TO_DATE($P{P_DATA_FIM},'DD/MM/YYYY')
+            GROUP BY MOV.DATA_LANCAMENTO
+                    ,H.NOME_FANTASIA
+                    ,TL.DESCRICAO_LANCAMENTO
+            HAVING SUM(MOV.VALOR_LANCAMENTO*-1) > 0
+            ORDER BY MOV.DATA_LANCAMENTO,H.NOME_FANTASIA]]>
+	</queryString>
+	<field name="DATA_VENDA" class="java.sql.Timestamp"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="DESCRICAO_LANCAMENTO" class="java.lang.String"/>
+	<field name="ID_MOVIMENTO" class="java.math.BigDecimal"/>
+	<field name="VALOR_BRUTO" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="14">
+			<staticText>
+				<reportElement x="1" y="0" width="60" height="14"/>
+				<textElement/>
+				<text><![CDATA[DATA VENDA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="66" y="0" width="60" height="14"/>
+				<textElement/>
+				<text><![CDATA[HOTEL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="237" y="0" width="147" height="14"/>
+				<textElement/>
+				<text><![CDATA[DESCRICAO DO LANCAMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="0" width="100" height="14"/>
+				<textElement/>
+				<text><![CDATA[ID_MOVIMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="489" y="0" width="60" height="14"/>
+				<textElement/>
+				<text><![CDATA[VALOR BRUTO]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="1" y="0" width="60" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{DATA_VENDA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="66" y="0" width="171" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="237" y="0" width="147" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{DESCRICAO_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="386" y="0" width="100" height="11"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ID_MOVIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="489" y="0" width="74" height="11"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{VALOR_BRUTO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

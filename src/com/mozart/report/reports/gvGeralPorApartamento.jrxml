@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="geralPorApartamento" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="TIPO" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Mozart\\Desenvolvimento\\Java\\Projetos\\MozartHotelReportsWeb\\src\\com\\mozart\\report\\reports\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{TIPO}.equals("1")?"Listagem de hóspedes Geral por Apto":"Listagem de hóspedes Geral por Hóspede"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="COFAN" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT * FROM(
+
+SELECT 1 ID,
+UNI.ID_APARTAMENTO,
+UNI.APTO,
+UNI.CREDITO,
+UNI.ID_RESERVA,
+UNI.DATA_ENTRADA,
+to_Char(UNI.DATA_SAIDA, 'dd/mm/yyyy')DATA_SAIDA,
+UNI.QTDE_ADULTOS,UNI.ADICIONAL,
+UNI.QTDE_CRIANCAS,TIPO_HOSPEDE,UNI.NOME_GRUPO,UNI.NOME_FANTASIA,UNI.STATUS,UNI.QTDE_CAFE,
+DECODE(UNI.TIPO_PENSAO, 'SIM', 'CM', 'NAO', 'SC', UNI.TIPO_PENSAO) TIPO,
+NVL(NOME, '<VAGO>')NOME, UNI.COFAN, NUM_APARTAMENTO
+FROM
+
+(SELECT  ID_ROOM_LIST ID, AP.ID_APARTAMENTO, AP.NUM_APARTAMENTO||'-'||TA.FANTASIA APTO, AP.NUM_APARTAMENTO, CHK.ID_RESERVA,
+CREDITO, CHK.DATA_ENTRADA,CHK.DATA_SAIDA,QTDE_ADULTOS,ADICIONAL,
+QTDE_CRIANCAS,TIPO_HOSPEDE,NOME_GRUPO,NOME_FANTASIA, AP.STATUS, QTDE_CAFE, TIPO_PENSAO, AP.COFAN, CHK.NOME
+
+FROM APARTAMENTO AP, TIPO_APARTAMENTO TA,
+
+(SELECT APARTAMENTO.ID_APARTAMENTO, ROOM_LIST.ID_ROOM_LIST,(TO_CHAR(APARTAMENTO.NUM_APARTAMENTO, '999999') || '-' ||TIPO_APARTAMENTO.FANTASIA) APTO,
+EMPRESA_REDE.CREDITO, CHECKIN.ID_RESERVA,
+DECODE(RTRIM(LTRIM(HOSPEDE.SOBRENOME_HOSPEDE)) || '/' || RTRIM(LTRIM(HOSPEDE.NOME_HOSPEDE)), '/', '<VAGO>',
+RTRIM(LTRIM(HOSPEDE.SOBRENOME_HOSPEDE)) || '/' || RTRIM(LTRIM(HOSPEDE.NOME_HOSPEDE))) NOME,
+CHECKIN.DATA_ENTRADA, CHECKIN.DATA_SAIDA, DECODE($P{TIPO},'1', CHECKIN.QTDE_ADULTOS, 1) QTDE_ADULTOS , CHECKIN.QTDE_CRIANCAS, TIPO_HOSPEDE.TIPO_HOSPEDE,
+RESERVA.NOME_GRUPO, APARTAMENTO.CARACTERISTICA, EMPRESA_REDE.NOME_FANTASIA, APARTAMENTO.STATUS, NVL(CHECKIN.ADICIONAL,0) ADICIONAL,CHECKIN.TIPO_PENSAO,
+DECODE(CHECKIN.TIPO_PENSAO,'NAO',0, DECODE(CHECKIN.QTDE_CAFE,0,0,1)) QTDE_CAFE, APARTAMENTO.COFAN
+FROM APARTAMENTO, CHECKIN, ROOM_LIST, EMPRESA_HOTEL, TIPO_HOSPEDE, RESERVA, TIPO_APARTAMENTO, CONTROLA_DATA CD, HOSPEDE,EMPRESA_REDE
+WHERE APARTAMENTO.ID_HOTEL = $P{IDH}
+AND APARTAMENTO.ID_HOTEL = CD.ID_HOTEL
+AND APARTAMENTO.ID_APARTAMENTO = CHECKIN.ID_APARTAMENTO(+)
+AND CHECKIN.ID_HOTEL = EMPRESA_HOTEL.ID_HOTEL
+AND CHECKIN.ID_CHECKIN = ROOM_LIST.ID_CHECKIN
+AND CHECKIN.ID_EMPRESA = EMPRESA_HOTEL.ID_EMPRESA
+AND CHECKIN.CHECKOUT = 'N'
+AND ROOM_LIST.PRINCIPAL LIKE DECODE($P{TIPO}, '1', 'S', '%')
+AND ROOM_LIST.DATA_SAIDA IS NULL
+AND EMPRESA_HOTEL.ID_EMPRESA = EMPRESA_REDE.ID_EMPRESA
+AND CD.ID_REDE_HOTEL = EMPRESA_REDE.ID_REDE_HOTEL
+AND HOSPEDE.ID_HOSPEDE = ROOM_LIST.ID_HOSPEDE
+AND HOSPEDE.ID_TIPO_HOSPEDE = TIPO_HOSPEDE.ID_TIPO_HOSPEDE
+AND CHECKIN.ID_RESERVA = RESERVA.ID_RESERVA(+)
+AND TIPO_APARTAMENTO.ID_TIPO_APARTAMENTO = APARTAMENTO.ID_TIPO_APARTAMENTO
+ORDER BY APTO) CHK
+
+WHERE AP.ID_HOTEL = $P{IDH}
+AND AP.ID_TIPO_APARTAMENTO = TA.ID_TIPO_APARTAMENTO
+AND AP.ID_APARTAMENTO = CHK.ID_APARTAMENTO(+)
+
+)UNI
+)
+WHERE COFAN LIKE $P{COFAN}
+ORDER BY NUM_APARTAMENTO, DECODE ($P{TIPO}, '1', NUM_APARTAMENTO ||'', '2', NOME)]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_APARTAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="APTO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CREDITO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_RESERVA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_ENTRADA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_SAIDA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="QTDE_ADULTOS" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ADICIONAL" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="QTDE_CRIANCAS" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TIPO_HOSPEDE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NOME_GRUPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NOME_FANTASIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="STATUS" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="QTDE_CAFE" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TIPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NOME" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="TOTAL_ADL" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTDE_ADULTOS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_CHD" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTDE_CRIANCAS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double (0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_ADD" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{ADICIONAL}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_QTDE" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTDE_CAFE}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_MAP" class="java.lang.String"/>
+	<variable name="QTDE_SC" class="java.lang.Long" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIPO}.equals("SC")?new Long(1):new Long(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Long(0)]]></initialValueExpression>
+	</variable>
+	<variable name="QTDE_ALL" class="java.lang.String" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIPO}.equals("ALL")?new Long(1):new Long(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Long (0)]]></initialValueExpression>
+	</variable>
+	<variable name="QTDE_FAP" class="java.lang.Long" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIPO}.equals("FAP")?new Long(1):new Long(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Long(0)]]></initialValueExpression>
+	</variable>
+	<variable name="QTDE_MAP" class="java.lang.Long" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{TIPO}.equals("MAP")?new Long(1):new Long(0)]]></variableExpression>
+		<initialValueExpression><![CDATA[new Long(0)]]></initialValueExpression>
+	</variable>
+	<group name="idApartamentoReportGroup">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<staticText>
+					<reportElement x="291" y="2" width="23" height="12"/>
+					<textElement>
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<textField pattern="###0" isBlankWhenNull="true">
+					<reportElement x="315" y="2" width="18" height="12"/>
+					<textElement textAlignment="Center">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_ADL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0" isBlankWhenNull="true">
+					<reportElement x="334" y="2" width="20" height="12"/>
+					<textElement textAlignment="Center">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_CHD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0" isBlankWhenNull="true">
+					<reportElement x="355" y="2" width="20" height="12"/>
+					<textElement textAlignment="Center">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_ADD}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0" isBlankWhenNull="true">
+					<reportElement x="376" y="2" width="22" height="12"/>
+					<textElement textAlignment="Center">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_QTDE}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="1" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="-1" y="14" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="79"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{P_TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="38" height="14"/>
+				<textElement textAlignment="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="38" y="0" width="23" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cred]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="0" width="38" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reserva]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="0" width="120" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome Hóspede]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="0" width="40" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="0" width="40" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="316" y="0" width="18" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Adl]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="0" width="20" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chd]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="0" width="20" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Add]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="0" width="22" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Qtde]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="399" y="0" width="35" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pensão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="0" width="25" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="461" y="0" width="29" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grupo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="492" y="0" width="59" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Empresa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="552" y="0" width="21" height="14"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STS]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="573" height="1"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="38" height="9"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APTO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="38" y="1" width="23" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREDITO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="62" y="1" width="38" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID_RESERVA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="101" y="1" width="120" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="221" y="1" width="40" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="262" y="1" width="40" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_SAIDA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="335" y="1" width="20" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTDE_CRIANCAS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="316" y="1" width="18" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTDE_ADULTOS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="356" y="1" width="20" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADICIONAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="377" y="1" width="22" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTDE_CAFE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="399" y="1" width="35" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIPO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="435" y="1" width="25" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIPO_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="461" y="1" width="29" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="492" y="1" width="59" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="552" y="1" width="21" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="302" y="1" width="13" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}.equals("IN")?"**":$F{DATA_SAIDA}.equals($P{FRONT_OFFICE})?"*":""]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<staticText>
+				<reportElement x="488" y="2" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="561" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="544" y="2" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="527" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="1" width="573" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="36">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="36"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

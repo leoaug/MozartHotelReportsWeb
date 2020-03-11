@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RecebimentosFaturamentoReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="820" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.csv.field.delimiter" value=";"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<style name="DEFAULT" isDefault="true" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="IDH" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT                 TO_CHAR(D.DATA_LANCAMENTO,'DD/MM/YYYY') DATA
+                      ,REPLACE(TO_CHAR((D.DATA_VENCIMENTO - D.DATA_LANCAMENTO),'900'),' ','') || DECODE((D.DATA_VENCIMENTO - D.DATA_LANCAMENTO),1,' DIA',' DIAS') DIAS
+                      ,H.NOME_FANTASIA HOTEL
+                      ,D.NUM_DUPLICATA || D.NUM_PARCELAS || D.ANO NUMERO
+                      ,TO_CHAR(E.CGC) CNPJ
+                      ,TO_CHAR(D.DATA_VENCIMENTO,'DD/MM/YYYY') VENCIMENTO
+                      ,MOV.ID_MOVIMENTO_APARTAMENTO ID_MOVIMENTO
+                      ,D.VALOR_DUPLICATA VALOR
+                      ,D.COMISSAO
+                      ,D.ENCARGOS
+                      ,D.AJUSTES
+                      ,D.IR_RETENCAO
+                      ,D.COFINS
+                      ,D.PIS
+                      ,D.CSSL
+                      ,D.ISS
+                 FROM CHECKIN C
+                     JOIN HOTEL H ON (C.ID_HOTEL = H.ID_HOTEL)
+                     JOIN MOVIMENTO_APARTAMENTO MOV ON (C.ID_CHECKIN = MOV.ID_CHECKIN AND MOV.ID_HOTEL = C.ID_HOTEL)
+                     JOIN STATUS_NOTA SN ON (MOV.ID_NOTA = SN.ID_NOTA AND SN.ID_HOTEL = H.ID_HOTEL)
+                     JOIN TIPO_LANCAMENTO TL ON (MOV.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO)
+                     JOIN DUPLICATA D ON (D.ID_NOTA  = SN.ID_NOTA AND D.ID_NOTA = MOV.ID_NOTA)
+                     JOIN EMPRESA_REDE ER ON (H.ID_REDE_HOTEL = ER.ID_REDE_HOTEL AND D.ID_EMPRESA = ER.ID_EMPRESA)
+                     JOIN EMPRESA E ON (E.ID_EMPRESA = D.ID_EMPRESA)
+               WHERE H.ID_HOTEL = $P{IDH}
+                 AND TL.ID_IDENTIFICA_LANCAMENTO = 18
+                 AND TRUNC(MOV.DATA_LANCAMENTO) BETWEEN  TO_DATE($P{P_DATA},'DD/MM/YYYY') AND TO_DATE($P{P_DATA_FIM},'DD/MM/YYYY')
+                 AND D.VALOR_DUPLICATA > 0
+                 AND D.IMPRIMIR = 'S'
+                 ORDER BY MOV.DATA_LANCAMENTO ,H.NOME_FANTASIA]]>
+	</queryString>
+	<field name="DATA" class="java.lang.String"/>
+	<field name="DIAS" class="java.lang.String"/>
+	<field name="HOTEL" class="java.lang.String"/>
+	<field name="NUMERO" class="java.lang.String"/>
+	<field name="CNPJ" class="java.lang.String"/>
+	<field name="VENCIMENTO" class="java.lang.String"/>
+	<field name="ID_MOVIMENTO" class="java.math.BigDecimal"/>
+	<field name="VALOR" class="java.math.BigDecimal"/>
+	<field name="COMISSAO" class="java.math.BigDecimal"/>
+	<field name="ENCARGOS" class="java.math.BigDecimal"/>
+	<field name="AJUSTES" class="java.math.BigDecimal"/>
+	<field name="IR_RETENCAO" class="java.math.BigDecimal"/>
+	<field name="COFINS" class="java.math.BigDecimal"/>
+	<field name="PIS" class="java.math.BigDecimal"/>
+	<field name="CSSL" class="java.math.BigDecimal"/>
+	<field name="ISS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="16">
+			<staticText>
+				<reportElement x="1" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[DATA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="51" y="0" width="20" height="14"/>
+				<textElement/>
+				<text><![CDATA[DIAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="0" width="55" height="14"/>
+				<textElement/>
+				<text><![CDATA[VENCIMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="171" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[NUMERO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[CNPJ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="0" width="63" height="14"/>
+				<textElement/>
+				<text><![CDATA[ID_MOVIMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="432" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[VALOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="472" y="0" width="49" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[COMISSAO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="521" y="0" width="50" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[ENCARGOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="571" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[AJUSTES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="611" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[IR RET.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="651" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[COFINS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="691" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[PIS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="732" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[CSLL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="772" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[ISS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[HOTEL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="355" y="0" width="77" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ID_MOVIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="51" y="0" width="20" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{DIAS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="171" y="0" width="52" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{NUMERO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="223" y="0" width="73" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CNPJ}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="299" y="0" width="55" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{VENCIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="0" width="100" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="50" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{DATA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="432" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{VALOR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="472" y="0" width="49" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{COMISSAO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="521" y="0" width="50" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ENCARGOS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement x="571" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AJUSTES}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="611" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{IR_RETENCAO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="651" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{COFINS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="691" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{PIS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="732" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{CSSL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="772" y="0" width="40" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ISS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

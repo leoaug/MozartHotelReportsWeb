@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cusGeralReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="820" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.7715610000000013"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Relatório de custos Gerais - Mensal"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IDCCC" class="java.lang.String"/>
+	<parameter name="PRODUTIVO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID_DEPARTAMENTO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DEPARTAMENTO.DESCRICAO,
+         DEPARTAMENTO.ID_DEPARTAMENTO,
+         CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL,
+         CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO,
+         DECODE (TRIM (TIPO_ITEM.APELIDO),
+                 'A', 'ALIMENTOS',
+                 'B', 'BEBIDAS',
+                 'O', 'OUTROS PROD.REVENDA',
+                 'D', 'DIVERSOS',
+                 'I', 'IMOBILIZADO')
+            TIPO_PRODUTO,
+         PRODUTIVO,
+         (TIPO_ITEM.APELIDO) REVENDA,
+         NVL(Y.SLD_ANT,0) SLD_ANT,
+         NVL(X.VT,0) ENTRADAS,
+         NVL(Z.VT,0) APORCIONAR,
+         NVL(W.VT,0) PORCIONADA,
+         NVL(K.VT,0) DEVOLUCAO,
+         NVL(J.VT,0) TRANSF_ENTRADA,
+         NVL(H.VT,0) TRANSF_SAIDA,
+         NVL(I.VT,0) CONSUMO_INTERNO,
+         NVL(INV.INV_FINAL_PDV,0) INV_FINAL_PDV,
+           NVL (Y.SLD_ANT,0)
+         + NVL (X.VT, 0)
+         + NVL (Z.VT, 0)
+         + NVL (J.VT, 0)
+         - NVL (H.VT, 0)
+         - NVL (W.VT, 0)
+         - NVL (K.VT, 0)
+         - NVL (I.VT, 0)
+         - NVL (INV.INV_FINAL_PDV,0)
+           CUSTO,
+           NVL(VENDA,0),
+         ( NVL (Y.SLD_ANT,0)
+          + NVL (X.VT, 0)
+          + NVL (Z.VT, 0)
+          + NVL (J.VT, 0)
+          - NVL (H.VT, 0)
+          - NVL (W.VT, 0)
+          - NVL (K.VT, 0)
+          - NVL (I.VT, 0)
+          - NVL (INV.INV_FINAL_PDV, 0))
+         * 100
+         / VENDA
+            PERC_CUSTO,
+         CENTRO_CUSTO_CONTABIL.TIPO_PESSOA
+    FROM MOVIMENTO_ESTOQUE,
+         CENTRO_CUSTO_CONTABIL,
+         ITEM_ESTOQUE,
+         ITEM_REDE,
+         DEPARTAMENTO,
+         PONTO_VENDA,
+         TIPO_ITEM,
+         (SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SLD_ANT
+            FROM SLD_EST
+           WHERE ANO =
+                    DECODE (
+                       TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'), 'MM'),
+                       1, TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'), 'YYYY') - 1,
+                       TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'), 'YYYY'))
+                 AND MES =
+                        DECODE (
+                           TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'), 'MM') - 1,
+                           0, 12,
+                           TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'), 'MM') - 1, TO_CHAR (
+                                                                                   TO_DATE (
+                                                                                      $P{P_DATA},
+                                                                                      'DD/MM/YYYY'),
+                                                                                   'MM'))) Y,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) AS VT
+              FROM MOV_EST
+             WHERE TIPO_MOVIMENTO IN ('S', 'T') AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) X,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) VT
+              FROM MOV_EST
+             WHERE     TIPO_MOVIMENTO IN ('P')
+                   AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND ID_MOVIMENTO_ESTOQUE_PORCAO IS NULL
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) Z,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) VT
+              FROM MOV_EST
+             WHERE     TIPO_MOVIMENTO IN ('P')
+                   AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND ID_MOVIMENTO_ESTOQUE_PORCAO IS NOT NULL
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) W,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) AS VT
+              FROM MOV_EST
+             WHERE TIPO_MOVIMENTO IN ('D') AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) K,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) AS VT
+              FROM MOV_EST
+             WHERE TIPO_MOVIMENTO IN ('T') AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) J,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) AS VT
+              FROM MOV_EST
+             WHERE TIPO_MOVIMENTO IN ('R') AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) H,
+         (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) AS VT
+              FROM MOV_EST
+             WHERE TIPO_MOVIMENTO IN ('C') AND MOV_EST.ID_HOTEL = $P{IDH}
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) I,
+         (  SELECT CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL,
+                   CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO,
+                   TIPO_ITEM.APELIDO,
+                   (NVL (B.SLD_ANT, 0) + NVL (A.VT, 0) - NVL (C.VT, 0))
+                      INV_FINAL_PDV,
+                   VENDA
+              FROM MOVIMENTO_ESTOQUE,
+                   CENTRO_CUSTO_CONTABIL,
+                   ITEM_REDE,
+                   ITEM_ESTOQUE,
+                   TIPO_ITEM,
+                   (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) VT
+                        FROM MOV_EST
+                       WHERE     TIPO_MOVIMENTO IN ('S', 'T')
+                             AND CNT_CCC = 'S'
+                             AND MOV_EST.ID_HOTEL = $P{IDH}
+                             AND CNT_IE = 'S'
+                             AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                                   TO_DATE (
+                                                                      $P{P_DATA},
+                                                                      'dd/mm/YYYY'),
+                                                                   'MM')
+                                                            AND TO_DATE (
+                                                                   $P{P_DATA},
+                                                                   'dd/mm/YYYY')
+                    GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) A,
+                   (SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SLD_ANT
+                      FROM SLD_EST_CNT
+                     WHERE ANO =
+                              DECODE (
+                                 TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'), 'MM'),
+                                 1, TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'),
+                                             'YYYY')
+                                    - 1,
+                                 TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'),
+                                          'YYYY'))
+                           AND MES =
+                                  DECODE (
+                                     TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'),
+                                              'MM')
+                                     - 1,
+                                     0, 12,
+                                     TO_CHAR (TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'),
+                                              'MM')
+                                     - 1, TO_CHAR (
+                                             TO_DATE ($P{P_DATA}, 'DD/MM/YYYY'),
+                                             'MM'))) B,
+                   (  SELECT ID_CENTRO_CUSTO_CONTABIL, REVENDA, SUM (VLT) VT
+                        FROM MOV_EST
+                       WHERE     TIPO_MOVIMENTO IN ('B', 'R', 'A', 'C', 'D')
+                             AND CNT_IE = 'S'
+                             AND MOV_EST.ID_HOTEL = $P{IDH}
+                             AND CNT_CCC = 'S'
+                             AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                                   TO_DATE (
+                                                                      $P{P_DATA},
+                                                                      'dd/mm/YYYY'),
+                                                                   'MM')
+                                                            AND TO_DATE (
+                                                                   $P{P_DATA},
+                                                                   'dd/mm/YYYY')
+                    GROUP BY ID_CENTRO_CUSTO_CONTABIL, REVENDA) C,
+                   (  SELECT SUM (MR.VALOR_PRATO) VENDA,
+                             PV.ID_CENTRO_CUSTO_CONTABIL,
+                             APELIDO REVENDA
+                        FROM MOVIMENTO_RESTAURANTE MR
+                             JOIN PONTO_VENDA PV
+                                ON (MR.ID_PONTO_VENDA = PV.ID_PONTO_VENDA)
+                             JOIN CENTRO_CUSTO_CONTABIL CCC
+                                ON (PV.ID_CENTRO_CUSTO_CONTABIL =
+                                       CCC.ID_CENTRO_CUSTO_CONTABIL)
+                             JOIN PRATO PR
+                                ON (MR.ID_PRATO = PR.ID_PRATO)
+                             JOIN TIPO_ITEM TI
+                                ON (PR.ID_TIPO_ITEM = TI.ID_TIPO_ITEM)
+                       WHERE MR.ID_HOTEL = $P{IDH}
+                             AND TRUNC (MR.DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                                      TO_DATE (
+                                                                         $P{P_DATA},
+                                                                         'dd/mm/YYYY'),
+                                                                      'MM')
+                                                               AND TO_DATE (
+                                                                      $P{P_DATA},
+                                                                      'dd/mm/YYYY')
+                    GROUP BY PV.ID_CENTRO_CUSTO_CONTABIL, APELIDO) V
+             WHERE CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                      MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+                   AND MOVIMENTO_ESTOQUE.ID_ITEM = ITEM_REDE.ID_ITEM
+                   AND ITEM_REDE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM
+                   AND ITEM_ESTOQUE.ID_HOTEL = $P{IDH}
+                   AND ITEM_REDE.ID_REDE_HOTEL = MOVIMENTO_ESTOQUE.ID_REDE_HOTEL
+                   AND ITEM_REDE.ID_TIPO_ITEM = TIPO_ITEM.ID_TIPO_ITEM
+                   AND CENTRO_CUSTO_CONTABIL.CONTROLADO = 'S'
+                   AND ITEM_ESTOQUE.CONTROLADO = 'S'
+                   AND A.ID_CENTRO_CUSTO_CONTABIL =
+                          MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+                   AND B.ID_CENTRO_CUSTO_CONTABIL =
+                          MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+                   AND C.ID_CENTRO_CUSTO_CONTABIL =
+                          MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+                   AND V.ID_CENTRO_CUSTO_CONTABIL =
+                          MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+                   AND A.REVENDA = TIPO_ITEM.APELIDO
+                   AND B.REVENDA = TIPO_ITEM.APELIDO
+                   AND C.REVENDA = TIPO_ITEM.APELIDO
+                   AND V.REVENDA = TIPO_ITEM.APELIDO
+                   AND TRUNC (DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                         TO_DATE ($P{P_DATA},
+                                                                  'dd/mm/YYYY'),
+                                                         'MM')
+                                                  AND TO_DATE ($P{P_DATA},
+                                                               'dd/mm/YYYY')
+          GROUP BY CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL,
+                   CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO,
+                   TIPO_ITEM.APELIDO,
+                   B.SLD_ANT,
+                   A.VT,
+                   C.VT,
+                   V.VENDA) INV,
+         (  SELECT CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL,
+                   TIPO_ITEM.APELIDO,
+                   (CASE
+                       WHEN TIPO_ITEM.APELIDO = 'A'
+                            AND CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                                   PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL
+                       THEN
+                          'S'
+                       WHEN TIPO_ITEM.APELIDO = 'B'
+                            AND CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                                   PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL
+                       THEN
+                          'S'
+                       WHEN TIPO_ITEM.APELIDO = 'O'
+                            AND CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                                   PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL
+                       THEN
+                          'S'
+                       WHEN TIPO_ITEM.APELIDO = 'D'
+                            AND CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                                   PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL
+                       THEN
+                          'N'
+                       WHEN TIPO_ITEM.APELIDO = 'I'
+                            AND CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                                   PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL
+                       THEN
+                          'N'
+                       ELSE
+                          'N'
+                    END)
+                      PRODUTIVO
+              FROM ITEM_REDE ITEM_ESTOQUE,
+                   CENTRO_CUSTO_CONTABIL,
+                   PONTO_VENDA,
+                   MOVIMENTO_ESTOQUE,
+                   TIPO_ITEM
+             WHERE CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                      MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO(+)
+                   AND MOVIMENTO_ESTOQUE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM(+)
+                   AND ITEM_ESTOQUE.ID_TIPO_ITEM = TIPO_ITEM.ID_TIPO_ITEM
+                   AND PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL(+) =
+                          MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+                   AND MOVIMENTO_ESTOQUE.ID_HOTEL = $P{IDH}
+          GROUP BY CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL,
+                   TIPO_ITEM.APELIDO,
+                   PONTO_VENDA.ID_CENTRO_CUSTO_CONTABIL) PRODUT
+   WHERE CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL(+) =
+            MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+         AND MOVIMENTO_ESTOQUE.ID_ITEM = ITEM_REDE.ID_ITEM
+         AND ITEM_REDE.ID_TIPO_ITEM = TIPO_ITEM.ID_TIPO_ITEM
+         AND ITEM_REDE.ID_ITEM = ITEM_ESTOQUE.ID_ITEM
+         AND CENTRO_CUSTO_CONTABIL.ID_DEPARTAMENTO =
+                DEPARTAMENTO.ID_DEPARTAMENTO
+         AND ITEM_REDE.ID_REDE_HOTEL = DEPARTAMENTO.ID_REDE_HOTEL
+         AND X.ID_CENTRO_CUSTO_CONTABIL = MOVIMENTO_ESTOQUE.ID_CENTRO_CUSTO
+         AND Y.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND Z.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND W.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND K.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND J.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND H.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND I.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND INV.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND PRODUT.ID_CENTRO_CUSTO_CONTABIL(+) = X.ID_CENTRO_CUSTO_CONTABIL
+         AND X.REVENDA = TIPO_ITEM.APELIDO
+         AND Y.REVENDA(+) = X.REVENDA
+         AND Z.REVENDA(+) = X.REVENDA
+         AND W.REVENDA(+) = X.REVENDA
+         AND K.REVENDA(+) = X.REVENDA
+         AND J.REVENDA(+) = X.REVENDA
+         AND H.REVENDA(+) = X.REVENDA
+         AND I.REVENDA(+) = X.REVENDA
+         AND INV.APELIDO(+) = X.REVENDA
+         AND PRODUT.APELIDO(+) = X.REVENDA
+         AND TRUNC (MOVIMENTO_ESTOQUE.DATA_MOVIMENTO) BETWEEN TRUNC (
+                                                                 TO_DATE (
+                                                                    $P{P_DATA},
+                                                                    'dd/mm/YYYY'),
+                                                                 'MM')
+                                                          AND TO_DATE (
+                                                                 $P{P_DATA},
+                                                                 'dd/mm/YYYY')
+         AND ($P{PRODUTIVO} IS NULL OR PRODUTIVO = $P{PRODUTIVO})
+         AND ($P{IDCCC} IS NULL
+              OR CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL =
+                    $P{IDCCC})
+         AND ($P{ID_DEPARTAMENTO} IS NULL
+              OR DEPARTAMENTO.ID_DEPARTAMENTO = $P{ID_DEPARTAMENTO})
+GROUP BY DEPARTAMENTO.DESCRICAO,
+         DEPARTAMENTO.ID_DEPARTAMENTO,
+         CENTRO_CUSTO_CONTABIL.ID_CENTRO_CUSTO_CONTABIL,
+         CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO,
+         TIPO_ITEM.APELIDO,
+         Y.SLD_ANT,
+         X.VT,
+         Z.VT,
+         W.VT,
+         K.VT,
+         J.VT,
+         H.VT,
+         I.VT,
+         INV.INV_FINAL_PDV,
+         PRODUT.PRODUTIVO,
+         VENDA,
+         CENTRO_CUSTO_CONTABIL.TIPO_PESSOA
+         ORDER BY DEPARTAMENTO.DESCRICAO,CENTRO_CUSTO_CONTABIL.DESCRICAO_CENTRO_CUSTO, TIPO_PRODUTO]]>
+	</queryString>
+	<field name="DESCRICAO" class="java.lang.String"/>
+	<field name="ID_DEPARTAMENTO" class="java.math.BigDecimal"/>
+	<field name="ID_CENTRO_CUSTO_CONTABIL" class="java.math.BigDecimal"/>
+	<field name="DESCRICAO_CENTRO_CUSTO" class="java.lang.String"/>
+	<field name="TIPO_PRODUTO" class="java.lang.String"/>
+	<field name="PRODUTIVO" class="java.lang.String"/>
+	<field name="REVENDA" class="java.lang.String"/>
+	<field name="SLD_ANT" class="java.math.BigDecimal"/>
+	<field name="ENTRADAS" class="java.math.BigDecimal"/>
+	<field name="APORCIONAR" class="java.math.BigDecimal"/>
+	<field name="PORCIONADA" class="java.math.BigDecimal"/>
+	<field name="DEVOLUCAO" class="java.math.BigDecimal"/>
+	<field name="TRANSF_ENTRADA" class="java.math.BigDecimal"/>
+	<field name="TRANSF_SAIDA" class="java.math.BigDecimal"/>
+	<field name="CONSUMO_INTERNO" class="java.math.BigDecimal"/>
+	<field name="INV_FINAL_PDV" class="java.math.BigDecimal"/>
+	<field name="CUSTO" class="java.math.BigDecimal"/>
+	<field name="NVL(VENDA,0)" class="java.math.BigDecimal"/>
+	<field name="PERC_CUSTO" class="java.math.BigDecimal"/>
+	<field name="TIPO_PESSOA" class="java.lang.String"/>
+	<variable name="TOTAL_INV INICIAL" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{SLD_ANT}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="ENTRADAS" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{ENTRADAS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="APORCIONAR" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{APORCIONAR}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="PORCIONADA" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{PORCIONADA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="DEVOLUCAO" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEVOLUCAO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TRANSF_ENTRADA" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TRANSF_ENTRADA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TRANSF_SAIDA" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TRANSF_SAIDA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="CONSUMO_INTERNO" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{CONSUMO_INTERNO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="INV_FINAL_PDV" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{INV_FINAL_PDV}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="CUSTO" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{CUSTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="GROUP SOMATORIO">
+		<groupFooter>
+			<band height="15">
+				<staticText>
+					<reportElement x="155" y="0" width="64" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Totais:]]></text>
+				</staticText>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="284" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_INV INICIAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="329" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ENTRADAS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="374" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{APORCIONAR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="419" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{PORCIONADA}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="509" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TRANSF_ENTRADA}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="554" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TRANSF_SAIDA}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="599" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CONSUMO_INTERNO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="644" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{INV_FINAL_PDV}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="689" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CUSTO}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="2" y="-1" width="780" height="1"/>
+				</line>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="464" y="0" width="45" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{DEVOLUCAO}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="100" y="0" width="572" height="79"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="12" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="11" width="780" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="0" width="110" height="11"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Departamento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="0" width="110" height="11"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Centro de Custos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="0" width="62" height="11"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo Produto	T]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Inv. Inicial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="509" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Trans.Ent.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="644" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Inv. Final]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="599" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cons.Int.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="464" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Devolução]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Trans.Sai.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="689" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Custo Final]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="329" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Requisição]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[A Porcion.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="419" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Porcionada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="734" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Receita]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="779" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Perc.Custo]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="779" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERC_CUSTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="110" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRICAO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="111" y="0" width="110" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRICAO_CENTRO_CUSTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="464" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEVOLUCAO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="222" y="0" width="62" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIPO_PRODUTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="419" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PORCIONADA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="329" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENTRADAS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="284" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SLD_ANT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="644" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INV_FINAL_PDV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="599" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONSUMO_INTERNO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="509" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANSF_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="554" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANSF_SAIDA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="689" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUSTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="374" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APORCIONAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="734" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NVL(VENDA,0)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="60"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="12" splitType="Stretch">
+			<staticText>
+				<reportElement x="698" y="0" width="32" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="747" y="0" width="14" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="730" y="0" width="16" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="761" y="0" width="15" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="0" width="780" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="100" y="0" width="572" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

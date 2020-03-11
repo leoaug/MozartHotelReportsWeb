@@ -1,0 +1,12 @@
+<project default="deploy" basedir="./">
+	
+	<property name="reports.dir" value="./WebContent/WEB-INF/reports" />
+
+	<target name="deploy">
+		<mkdir dir="${reports.dir}" />
+		<copy todir="${reports.dir}" overwrite="true">
+			<fileset dir="./src/com/mozart/report/reports" includes="*.jasper" />
+		</copy>
+	</target>
+	
+</project>

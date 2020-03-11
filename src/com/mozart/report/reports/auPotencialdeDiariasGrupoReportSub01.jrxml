@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="potencialdeDiariasReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="DEFAULT" isDefault="true" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="RED" mode="Opaque" fontName="SansSerif" fontSize="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{LINHA_VERMELHA}]]></conditionExpression>
+			<style forecolor="#FF0000"/>
+		</conditionalStyle>
+	</style>
+	<style name="UNDERLINE">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{UNDERLINE}]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000099" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" isPdfEmbedded="false"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Potencial de Diárias"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1 TIPO, E.NUM_APARTAMENTO, E.NOME_FANTASIA, E.VALOR_DIA , initcap(E.JUSTIFICA_TARIFA)JUSTIFICA_TARIFA, E.BALCAO_DIA,
+B.SALDO_BALCAO_ANTERIOR,  A.SALDO_DIA_ANTERIOR,
+( B.SALDO_BALCAO_ANTERIOR - A.SALDO_DIA_ANTERIOR) DIFERENCA_ANTERIOR,
+DECODE(B.SALDO_BALCAO_ANTERIOR, 0, 0, (( B.SALDO_BALCAO_ANTERIOR - A.SALDO_DIA_ANTERIOR)/B.SALDO_BALCAO_ANTERIOR)* 100) PERCENTUAL_ANTERIOR,( E.BALCAO_DIA - E.VALOR_DIA) DIFERENCA_DIA,
+DECODE(E.BALCAO_DIA, 0, 0, (( E.BALCAO_DIA - E.VALOR_DIA)/E.BALCAO_DIA)* 100) PERCENTUAL_DIA,
+D.SALDO_BALCAO,  C.SALDO_DIA, ( D.SALDO_BALCAO - C.SALDO_DIA) DIFERENCA_ATUAL,
+DECODE(D.SALDO_BALCAO, 0, 0, (( D.SALDO_BALCAO - C.SALDO_DIA)/D.SALDO_BALCAO)* 100) PERCENTUAL_ATUAL,
+E.ALLL, E.FAP, E.MAP, E.ADULTO, E.CAFE, E.CRIANCA, E.DATA_ENTRADA, E.DATA_SAIDA, A.ALLL ANT_ALL,
+A.MAP ANT_MAP,
+A.FAP ANT_FAP, A.QTDE_CAFE ANT_CAFE, A.ADULTO ANT_ADULTO, A.CRIANCA ANT_CRIANCA, C.ALLL ATU_ALL,
+C.MAP ATU_MAP,
+C.FAP ATU_FAP, C.QTDE_CAFE ATU_CAFE, C.ADULTO ATU_ADULTO, C.CRIANCA ATU_CRIANCA ,
+to_Char(CD.FRONT_OFFICE, 'dd/mm/YYYY')FRONT_OFFICE
+FROM CONTROLA_DATA CD,
+(SELECT SUM(MA.VALOR_LANCAMENTO) SALDO_DIA_ANTERIOR, NVL(SUM(MA.ALL_INCLUSIVE),0)ALLL, NVL(SUM(MA.MAP),0)MAP,
+   NVL(SUM(MA.FAP),0)FAP, NVL(SUM(MA.QTDE_CAFE),0)QTDE_CAFE, NVL(SUM(MA.QTDE_ADULTOS),0)ADULTO, NVL(SUM(MA.QTDE_CRIANCAS),0)CRIANCA
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL
+WHERE MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN
+TRUNC(to_date($P{P_DATA},'DD/MM/YYYY'), 'MONTH') AND (to_date($P{P_DATA},'DD/MM/YYYY') -1)
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2, 3, 28)
+AND MA.ID_HOTEL = $P{IDH})  A,    -- SALDO DIA ANTERIOR
+(SELECT SUM(DECODE(CH.QTDE_ADULTOS,1,TA.PAX1,2,TA.PAX2, 3,TA.PAX3,4,TA.PAX4,5,TA.PAX5)) SALDO_BALCAO_ANTERIOR
+FROM MOVIMENTO_APARTAMENTO MA, APARTAMENTO AP, TIPO_LANCAMENTO TL, CHECKIN CH, TARIFA T,TARIFA_APARTAMENTO TA , MOEDA M
+WHERE MA.ID_CHECKIN = CH.ID_CHECKIN
+AND AP.ID_APARTAMENTO = CH.ID_APARTAMENTO
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'DD/MM/YYYY'), 'MONTH') AND (to_date($P{P_DATA},'DD/MM/YYYY') -1)
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2)
+AND T.ID_TARIFA = TA.ID_TARIFA
+AND TA.ID_TIPO_APARTAMENTO = AP.ID_TIPO_APARTAMENTO
+AND T.TIPO = 'B'
+AND M.ID_MOEDA = T.ID_MOEDA
+AND M.SIGLA = 'BRL'
+AND to_date($P{P_DATA},'DD/MM/YYYY') BETWEEN trunc(T.DATA_ENTRADA) AND trunc(T.DATA_SAIDA)
+AND CH.ID_HOTEL = $P{IDH}
+AND MA.ID_HOTEL = CH.ID_HOTEL) B,       -- SALDO BALCAO DIA ANTERIOR
+(SELECT SUM(MA.VALOR_LANCAMENTO) SALDO_DIA, NVL(SUM(MA.ALL_INCLUSIVE),0)ALLL, NVL(SUM(MA.MAP),0)MAP,
+   NVL(SUM(MA.FAP),0)FAP, NVL(SUM(MA.QTDE_CAFE),0)QTDE_CAFE, NVL(SUM(MA.QTDE_ADULTOS),0)ADULTO, NVL(SUM(MA.QTDE_CRIANCAS
+),0)CRIANCA
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL
+WHERE MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'DD/MM/YYYY'), 'MONTH')
+AND to_date($P{P_DATA},'DD/MM/YYYY')
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2, 3, 28)
+AND MA.ID_HOTEL = $P{IDH})  C,    -- SALDO ATUAL
+(SELECT SUM(DECODE(CH.QTDE_ADULTOS,1,TA.PAX1,2,TA.PAX2, 3,TA.PAX3,4,TA.PAX4,5,TA.PAX5)) SALDO_BALCAO
+FROM MOVIMENTO_APARTAMENTO MA, APARTAMENTO AP, TIPO_LANCAMENTO TL, CHECKIN CH, TARIFA T,
+TARIFA_APARTAMENTO TA,MOEDA M
+WHERE MA.ID_CHECKIN = CH.ID_CHECKIN
+AND AP.ID_APARTAMENTO = CH.ID_APARTAMENTO
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'DD/MM/YYYY'),'MONTH') AND to_date($P{P_DATA},'DD/MM/YYYY')
+AND M.ID_MOEDA = T.ID_MOEDA
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2)
+AND T.ID_TARIFA = TA.ID_TARIFA
+AND TA.ID_TIPO_APARTAMENTO = AP.ID_TIPO_APARTAMENTO
+AND T.TIPO = 'B'
+AND M.SIGLA = 'BRL'
+AND to_date($P{P_DATA},'DD/MM/YYYY') BETWEEN trunc(T.DATA_ENTRADA) AND trunc(T.DATA_SAIDA)
+AND CH.ID_HOTEL = $P{IDH}) D,       -- SALDO BALCAO ATUAL
+(SELECT AP.NUM_APARTAMENTO, ER.NOME_FANTASIA, SUM(MA.VALOR_LANCAMENTO) VALOR_DIA, NVL(MA.ALL_INCLUSIVE,0) ALLL, NVL(MA.FAP,0) FAP,
+NVL(MA.MAP,0) MAP, NVL(MA.QTDE_ADULTOS,0) ADULTO, NVL(MA.QTDE_CAFE,0) CAFE, NVL(MA.QTDE_CRIANCAS,0)CRIANCA,
+CH.DATA_ENTRADA, CH.DATA_SAIDA,
+CH.JUSTIFICA_TARIFA, NVL(DECODE(CH.QTDE_ADULTOS,1,TA.PAX1,2,TA.PAX2, 3,TA.PAX3,4,TA.PAX4,5,TA.PAX5), 0) BALCAO_DIA
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, APARTAMENTO AP, CHECKIN CH, TARIFA T, MOEDA M, EMPRESA_REDE ER, HOTEL HO,TARIFA_APARTAMENTO TA
+WHERE AP.ID_APARTAMENTO = CH.ID_APARTAMENTO
+AND CH.ID_HOTEL = HO.ID_HOTEL
+AND ER.ID_EMPRESA = CH.ID_EMPRESA
+AND HO.ID_REDE_HOTEL = ER.ID_REDE_HOTEL
+AND MA.ID_CHECKIN = CH.ID_CHECKIN
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND trunc(MA.DATA_LANCAMENTO) = to_date($P{P_DATA},'DD/MM/YYYY')
+AND M.ID_MOEDA = T.ID_MOEDA
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 28, 2, 3)
+AND T.ID_TARIFA = TA.ID_TARIFA
+AND TA.ID_TIPO_APARTAMENTO = AP.ID_TIPO_APARTAMENTO
+AND T.TIPO = 'B'
+AND M.SIGLA = 'BRL'
+AND to_date($P{P_DATA},'DD/MM/YYYY') BETWEEN trunc(T.DATA_ENTRADA) AND trunc(T.DATA_SAIDA)
+AND CH.ID_HOTEL = $P{IDH}
+GROUP BY AP.NUM_APARTAMENTO, ER.NOME_FANTASIA,
+CH.JUSTIFICA_TARIFA, CH.QTDE_ADULTOS, TA.PAX1, TA.PAX2,TA.PAX3, TA.PAX4, TA.PAX5,MA.ALL_INCLUSIVE, MA.FAP, MA.MAP, MA.QTDE_ADULTOS, MA.QTDE_CAFE, MA.QTDE_CRIANCAS,
+CH.DATA_ENTRADA, CH.DATA_SAIDA) E
+WHERE CD.ID_HOTEL=$P{IDH}]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal"/>
+	<field name="NUM_APARTAMENTO" class="java.math.BigDecimal"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="VALOR_DIA" class="java.math.BigDecimal"/>
+	<field name="JUSTIFICA_TARIFA" class="java.lang.String"/>
+	<field name="BALCAO_DIA" class="java.math.BigDecimal"/>
+	<field name="SALDO_BALCAO_ANTERIOR" class="java.math.BigDecimal"/>
+	<field name="SALDO_DIA_ANTERIOR" class="java.math.BigDecimal"/>
+	<field name="DIFERENCA_ANTERIOR" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_ANTERIOR" class="java.math.BigDecimal"/>
+	<field name="DIFERENCA_DIA" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_DIA" class="java.math.BigDecimal"/>
+	<field name="SALDO_BALCAO" class="java.math.BigDecimal"/>
+	<field name="SALDO_DIA" class="java.math.BigDecimal"/>
+	<field name="DIFERENCA_ATUAL" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_ATUAL" class="java.math.BigDecimal"/>
+	<field name="ALLL" class="java.math.BigDecimal"/>
+	<field name="FAP" class="java.math.BigDecimal"/>
+	<field name="MAP" class="java.math.BigDecimal"/>
+	<field name="ADULTO" class="java.math.BigDecimal"/>
+	<field name="CAFE" class="java.math.BigDecimal"/>
+	<field name="CRIANCA" class="java.math.BigDecimal"/>
+	<field name="DATA_ENTRADA" class="java.sql.Timestamp"/>
+	<field name="DATA_SAIDA" class="java.sql.Timestamp"/>
+	<field name="ANT_ALL" class="java.math.BigDecimal"/>
+	<field name="ANT_MAP" class="java.math.BigDecimal"/>
+	<field name="ANT_FAP" class="java.math.BigDecimal"/>
+	<field name="ANT_CAFE" class="java.math.BigDecimal"/>
+	<field name="ANT_ADULTO" class="java.math.BigDecimal"/>
+	<field name="ANT_CRIANCA" class="java.math.BigDecimal"/>
+	<field name="ATU_ALL" class="java.math.BigDecimal"/>
+	<field name="ATU_MAP" class="java.math.BigDecimal"/>
+	<field name="ATU_FAP" class="java.math.BigDecimal"/>
+	<field name="ATU_CAFE" class="java.math.BigDecimal"/>
+	<field name="ATU_ADULTO" class="java.math.BigDecimal"/>
+	<field name="ATU_CRIANCA" class="java.math.BigDecimal"/>
+	<field name="FRONT_OFFICE" class="java.lang.String"/>
+	<variable name="BALCAO_DIA_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BALCAO_DIA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="DESCONTO_TOTAL_DIA" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DIFERENCA_DIA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="SALDO_MES_BALCAO" class="java.lang.String">
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="VALOR_DIA_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALOR_DIA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="SALDO_COBRADO_TOTAL" class="java.lang.String">
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_ADULTO" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ADULTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_CRIANCA" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CRIANCA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_MAP" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{MAP}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_FAP" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{FAP}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_ALL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ALLL}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_CAFE" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAFE}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="potencialDiariasGroupReport">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<staticText>
+					<reportElement x="249" y="2" width="87" height="10"/>
+					<textElement textAlignment="Left">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Empresa]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="338" y="2" width="45" height="10"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Balcão]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="383" y="2" width="43" height="10"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Cobrado]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="427" y="2" width="40" height="10"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Desconto]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="473" y="2" width="48" height="10"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Desconto %]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="524" y="2" width="48" height="10"/>
+					<textElement textAlignment="Left">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Justificativa]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="209" y="2" width="19" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[All]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="229" y="2" width="20" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Café]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="151" y="2" width="19" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Chd]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="171" y="2" width="19" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Map]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="190" y="2" width="18" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Fap]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="3" y="2" width="19" height="10"/>
+					<textElement textAlignment="Left">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Apto]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="23" y="2" width="55" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Entrada]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="79" y="2" width="50" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Saída]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="130" y="2" width="20" height="10"/>
+					<textElement textAlignment="Center">
+						<font size="7" isBold="true" isItalic="false"/>
+					</textElement>
+					<text><![CDATA[Adl]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="14" width="573" height="1"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="46">
+				<staticText>
+					<reportElement x="2" y="1" width="59" height="13"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total dia]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="16" width="78" height="13"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Saldo anterior]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="32" width="59" height="13"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Saldo mês]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="0" width="573" height="1"/>
+				</line>
+				<line>
+					<reportElement x="0" y="15" width="573" height="1"/>
+				</line>
+				<line>
+					<reportElement x="0" y="30" width="573" height="1"/>
+				</line>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="473" y="32" width="35" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PERCENTUAL_ATUAL}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="509" y="32" width="10" height="13"/>
+					<textElement>
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[%]]></text>
+				</staticText>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="427" y="32" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DIFERENCA_ATUAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="338" y="16" width="45" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALDO_BALCAO_ANTERIOR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="338" y="1" width="45" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{BALCAO_DIA_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="427" y="1" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{DESCONTO_TOTAL_DIA}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="427" y="16" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DIFERENCA_ANTERIOR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="338" y="32" width="45" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALDO_BALCAO_ANTERIOR}+$V{BALCAO_DIA_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="383" y="1" width="43" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{VALOR_DIA_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="383" y="16" width="43" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALDO_DIA_ANTERIOR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="384" y="32" width="43" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{VALOR_DIA_TOTAL}+$F{SALDO_DIA_ANTERIOR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="473" y="16" width="35" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PERCENTUAL_ANTERIOR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="473" y="1" width="35" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PERCENTUAL_DIA}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="509" y="16" width="10" height="13"/>
+					<textElement>
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[%]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="509" y="1" width="10" height="13"/>
+					<textElement>
+						<font size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[%]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="209" y="17" width="19" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ANT_ALL}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="209" y="32" width="19" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ATU_ALL}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="171" y="17" width="17" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ANT_MAP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="151" y="17" width="19" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ANT_CRIANCA}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="130" y="17" width="20" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ANT_ADULTO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="190" y="17" width="18" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ANT_FAP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="229" y="17" width="22" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ANT_CAFE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="171" y="32" width="17" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ATU_MAP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="151" y="32" width="20" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ATU_CRIANCA}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="130" y="32" width="20" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ATU_ADULTO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="190" y="32" width="18" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ATU_FAP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="229" y="32" width="22" height="10"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ATU_CAFE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="">
+					<reportElement x="130" y="1" width="20" height="13"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{TOTAL_ADULTO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="151" y="1" width="19" height="13"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{TOTAL_CRIANCA}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="171" y="1" width="19" height="13"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{TOTAL_MAP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="190" y="1" width="18" height="13"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{TOTAL_FAP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="229" y="1" width="20" height="13"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{TOTAL_CAFE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="209" y="1" width="19" height="13"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{TOTAL_ALL}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="81" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="81"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$F{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement x="3" y="0" width="36" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_APARTAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="39" y="0" width="45" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="85" y="0" width="45" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_SAIDA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="171" y="0" width="19" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MAP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="190" y="0" width="18" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FAP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="0" width="20" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADULTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="151" y="0" width="19" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CRIANCA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="209" y="0" width="19" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ALLL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="229" y="0" width="20" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAFE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="524" y="0" width="48" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JUSTIFICA_TARIFA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="0" width="87" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="338" y="0" width="45" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BALCAO_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="427" y="0" width="40" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIFERENCA_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="473" y="0" width="35" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_DIA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="509" y="0" width="10" height="11"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="383" y="0" width="43" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_DIA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<staticText>
+				<reportElement x="480" y="2" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="516" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="534" y="2" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="552" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="1" width="573" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

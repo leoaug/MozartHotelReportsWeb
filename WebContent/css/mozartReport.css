@@ -1,0 +1,22 @@
+.divLoading {
+	background-color: white;
+	height: 50px;
+	width: 310px;
+	border: 1px solid rgb(82, 82, 82);
+}
+
+.divLoading img {
+	margin-top: 4%;
+	margin-left: 5%;
+	float: left;
+	vertical-align: middle;
+}
+
+.divLoading p {
+	margin-top: 6%;
+	margin-left: 7%;
+	float: left;
+	font-family: Arial;
+	font-size: 12px;
+	color: black
+}

@@ -1,0 +1,1462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rdsGroupReport1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="572" leftMargin="0" rightMargin="23" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT * FROM (
+SELECT UNIQUE 1 TIPO, TL.GRUPO_LANCAMENTO,TL.SUB_GRUPO_LANCAMENTO ,TL.DESCRICAO_LANCAMENTO, A.RECEITA_CHECKOUT, B.RECEITA_CHECKOUT RECEITA_CHECKOUT_B,
+DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, 'S', 'N') GRUPO_DIARIA, A.DIARIA - VALOR_CAFE_DIA AS DIARIA, B.DIARIA_ACUMULADO - VALOR_CAFE_ACM AS DIARIA_ACUMULADO, C.HOSPEDE, C.CRIANCAS, C.CAFE, C.CORTESIA,
+D.HOSPEDE_ACUMULADO, D.CRIANCAS_ACUMULADO, D.CAFE_ACUMULADO,D.CORTESIA_ACUMULADO,
+E.SCORTESIA, F.SCORTESIA_ACUMULADO,
+C.GRUPO,MAPAFAP.MAP,MAPAFAP.FAP,MAPAFAP.ALL_INCLUSIVE,ACU_AMAPAFAP.AMAP,ACU_AMAPAFAP.AFAP,ACU_AMAPAFAP.AALL,
+(C.OCUPADOS) OCUPADOS,
+(D.OCUPADOS_acumulado) OCUPADOS_ACUMULADO,
+
+D.GRUPO_ACUMULADO, C.DIARIA_GRUPO, D.DIARIA_GRUPO_ACUMULADO,
+
+(DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, A.DIARIA, 0))DIARIA_TOTAL,
+(DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO, 0))DIARIA_TOTAL_ACUMULADO,
+J.RECEITA_TOTAL, L.RECEITA_TOTAL_ACUMULADO,
+DECODE(C.OCUPADOS, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, J.RECEITA_TOTAL, 0)/decode((C.OCUPADOS),0,1,(C.OCUPADOS))))DM_RECEITA_TOTAL,
+DECODE(C.OCUPADOS, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, L.RECEITA_TOTAL_ACUMULADO, 0)/decode((C.OCUPADOS),0,1,(C.OCUPADOS))) )DM_RECEITA_TOTAL_ACUMULADO,
+
+(C.OCUPADOS - C.GRUPO) INDIVIDUAL,
+(D.OCUPADOS_acumulado - D.GRUPO_ACUMULADO) INDIVIDUAL_ACUMULADO,
+
+(A.DIARIA - C.DIARIA_GRUPO )DIARIA_INDIVIDUAL, (B.DIARIA_ACUMULADO - D.DIARIA_GRUPO_ACUMULADO)DIARIA_INDIV_ACUMULADO,
+
+NVL(G.APARTAMENTO_DIA,0) APARTAMENTO_DIA,
+NVL(H.APARTAMENTO_ACUMULADO,0) APARTAMENTO_ACUMULADO,
+
+((DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, A.DIARIA, 0))/NVL(G.APARTAMENTO_DIA,0)) REVPAR_OCUPADOS_DIA,
+((DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO, 0))/NVL(H.APARTAMENTO_ACUMULADO,0) )REVPAR_OCUPADOS_ACUMULADO,
+
+DECODE(C.OCUPADOS, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, A.DIARIA, 0)/(DECODE(C.OCUPADOS,0,1,C.OCUPADOS))) )DM_OCUPADOS_DIA,
+DECODE((D.OCUPADOS_acumulado), 0, 0,(DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO, 0)/(D.OCUPADOS_acumulado)) )DM_OCUPADOS_ACUMULADO,
+
+DECODE(E.SCORTESIA, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, A.DIARIA, 0)/DECODE(E.SCORTESIA,0,1,E.SCORTESIA)) )DM_SCORTESIA_DIA,
+DECODE(F.SCORTESIA_ACUMULADO, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO, 0)/F.SCORTESIA_ACUMULADO) )DM_SCORTESIA_ACUMULADO,
+DECODE(C.CORTESIA, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, A.DIARIA, 0)/C.CORTESIA) )DM_CORTESIA_DIA,
+DECODE(D.CORTESIA_ACUMULADO, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO, 0)/D.CORTESIA_ACUMULADO) )DM_CORTESIA_ACUMULADO,
+DECODE(C.HOSPEDE, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO,1, A.DIARIA, 0)/C.HOSPEDE) )DM_HOSPEDE_DIA,
+DECODE(D.HOSPEDE_ACUMULADO, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO, 0)/D.HOSPEDE_ACUMULADO) )DM_HOSPEDE_ACUMULADO,
+DECODE(C.GRUPO, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, C.DIARIA_GRUPO, 0)/C.GRUPO) )DM_GRUPO_DIA,
+DECODE(D.GRUPO_ACUMULADO, 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, D.DIARIA_GRUPO_ACUMULADO, 0)/D.GRUPO_ACUMULADO) )DM_GRUPO_ACUMULADO,
+
+DECODE((C.OCUPADOS- C.GRUPO), 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, (A.DIARIA - C.DIARIA_GRUPO ), 0)/(DECODE(C.OCUPADOS - C.GRUPO,0,1,C.OCUPADOS - C.GRUPO))) )DM_INDIVIDUAL_DIA,
+DECODE((D.OCUPADOS_acumulado - D.GRUPO_ACUMULADO), 0, 0, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, (B.DIARIA_ACUMULADO - D.DIARIA_GRUPO_ACUMULADO), 0)/(D.OCUPADOS_acumulado - D.GRUPO_ACUMULADO)))DM_INDIVIDUAL_ACUMULADO,
+
+((C.OCUPADOS)*100/decode(nvl(G.APARTAMENTO_DIA,0),0,100,G.APARTAMENTO_DIA)) PERCENTUAL_OCUPADOS,
+
+((D.OCUPADOS_acumulado)*100/decode(nvl(H.APARTAMENTO_ACUMULADO,0),0,100,H.APARTAMENTO_ACUMULADO)) PERCENTUAL_OCUPADOS_ACUMULADO,
+
+((C.OCUPADOS - C.GRUPO)*100/decode(nvl(G.APARTAMENTO_DIA,0),0,100,G.APARTAMENTO_DIA)) PERCENTUAL_INDIV,
+
+((D.OCUPADOS_acumulado - D.GRUPO_ACUMULADO)*100/decode(nvl(H.APARTAMENTO_ACUMULADO,0),0,100,H.APARTAMENTO_ACUMULADO)) PERCENTUAL_INDIV_ACUMULADO,
+
+( C.GRUPO*100/decode(nvl(G.APARTAMENTO_DIA,0),0,100,G.APARTAMENTO_DIA)) PERCENTUAL_GRUPO,
+
+(D.GRUPO_ACUMULADO*100/decode(nvl(H.APARTAMENTO_ACUMULADO,0),0,100,H.APARTAMENTO_ACUMULADO)) PERCENTUAL_GRUPO_ACUMULADO,
+
+( C.CORTESIA*100/decode(nvl(G.APARTAMENTO_DIA,0),0,100,G.APARTAMENTO_DIA)) PERCENTUAL_CORTESIA,
+
+(D.CORTESIA_ACUMULADO*100/decode(nvl(H.APARTAMENTO_ACUMULADO,0),0,100,H.APARTAMENTO_ACUMULADO)) PERCENTUAL_CORTESIA_ACUMULADO,
+
+(E.SCORTESIA*100/decode(nvl(G.APARTAMENTO_DIA,0),0,100,G.APARTAMENTO_DIA)) PERCENTUAL_SCORTESIA,
+
+(F.SCORTESIA_ACUMULADO*100/decode(nvl(H.APARTAMENTO_ACUMULADO,0),0,100,H.APARTAMENTO_ACUMULADO)) PERCENTUAL_SCORTESIA_ACUMULADO,
+
+I.DOLAR,
+
+C.VALOR_CAFE_DIA CAFEDIA, D.VALOR_CAFE_ACM CAFEMES, (DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, A.DIARIA, 0)  - (C.VALOR_CAFE_DIA)) RECEITA_LIQUIDA_DIA,
+
+(DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 1, B.DIARIA_ACUMULADO,0) - (D.VALOR_CAFE_ACM)) RECEITA_LIQUIDA_MES
+,
+ pensao.pensoes
+
+------
+
+
+FROM TIPO_LANCAMENTO TL,
+
+--Tabela
+(SELECT NVL(SUM(MAP),0) MAP,NVL(SUM(FAP),0) FAP, NVL(SUM(ALL_INCLUSIVE),0) ALL_INCLUSIVE
+FROM MOVIMENTO_APARTAMENTO
+WHERE ID_HOTEL = $P{IDH}
+AND trunc(DATA_LANCAMENTO) = to_date($P{P_DATA},'dd/mm/yyyy') )MAPAFAP,
+
+
+--TaBela
+(SELECT NVL(SUM(MAP),0) AMAP,NVL(SUM(FAP),0) AFAP, NVL(SUM(ALL_INCLUSIVE),0) AALL
+FROM MOVIMENTO_APARTAMENTO
+WHERE ID_HOTEL = $P{IDH}
+AND trunc(DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy') )ACU_AMAPAFAP,
+
+--Tabela
+
+((SELECT ID_LANCAMENTO_PAI ID_DIARIA, RECEITA_CHECKOUT, NVL(ABS(SUM(MA.VALOR_LANCAMENTO)), 0) DIARIA
+FROM   MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE  TL.ID_LANCAMENTO_PAI IS NOT NULL
+AND trunc(MA.DATA_LANCAMENTO(+)) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND TL.ID_TIPO_LANCAMENTO = MA.ID_TIPO_LANCAMENTO(+)
+AND IL.ID_IDENTIFICA_LANCAMENTO IN (2,3,26,28)
+AND TL.ID_HOTEL = $P{IDH}
+AND MA.ID_HOTEL = TL.ID_HOTEL
+AND TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO
+AND IL.RECEITA_CHECKOUT = 1 -- EXCETO PAGAMENTO
+GROUP BY ID_LANCAMENTO_PAI, RECEITA_CHECKOUT) ) A,
+
+--TABELA
+
+((SELECT ID_LANCAMENTO_PAI ID_DIARIA_ACUMULADO, RECEITA_CHECKOUT, NVL(ABS(SUM(MA.VALOR_LANCAMENTO)), 0) DIARIA_ACUMULADO
+
+FROM   MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE  TL.ID_LANCAMENTO_PAI IS NOT NULL
+
+AND trunc(MA.DATA_LANCAMENTO(+)) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND TL.ID_TIPO_LANCAMENTO = MA.ID_TIPO_LANCAMENTO(+)
+AND IL.ID_IDENTIFICA_LANCAMENTO IN (2,3,26,28)
+AND TL.ID_HOTEL = $P{IDH}
+AND MA.ID_HOTEL = TL.ID_HOTEL
+
+AND TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO
+AND IL.RECEITA_CHECKOUT = 1 -- EXCETO PAGAMENTO
+GROUP BY ID_LANCAMENTO_PAI, RECEITA_CHECKOUT) ) B,
+
+
+--Tabela
+(
+SELECT
+
+COUNT(DUAL.DUMMY), MA.RECEITA_DIARIA, MA.OCUPADOS, MA.HOSPEDE,
+C.GRUPO, MA.CRIANCAS, MA.CAFES CAFE,B.CORTESIA, C.DIARIA_GRUPO, MA.VALOR_CAFE_DIA
+FROM DUAL,
+
+(
+
+SELECT
+SUM(NVL(MA.VALOR_LANCAMENTO,0)) RECEITA_DIARIA,
+COUNT((DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL, MA.ID_MOVIMENTO_APARTAMENTO))))
+-
+COUNT((DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_MOVIMENTO_APARTAMENTO,NULL)))OCUPADOS,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_ADULTOS,MA.QTDE_ADULTOS)),0) HOSPEDE,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_CRIANCAS,MA.QTDE_CRIANCAS)),0) CRIANCAS,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_CAFE,MA.QTDE_CAFE)),0) CAFES,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_CAFE,MA.QTDE_CAFE) * VC.VALOR_CAFE ),0)  VALOR_CAFE_DIA
+
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, CHECKIN C,
+(select id_hotel, data, valor_cafe, d2
+from valor_cafe vc, tipo_pensao tp
+where vc.id_tipo_pensao = tp.id_tipo_pensao and id_hotel = $P{IDH} and data = to_date($P{P_DATA},'dd/mm/yyyy')  and tp.ID_TIPO_PENSAO = 1) vc
+
+WHERE MA.ID_CHECKIN = C.ID_CHECKIN
+AND MA.ID_HOTEL = C.ID_HOTEL
+--AND trunc(MA.DATA_LANCAMENTO) BETWEEN trunc(C.DATA_ENTRADA) AND trunc(C.DATA_SAIDA)
+AND trunc(MA.DATA_LANCAMENTO) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL = $P{IDH}
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_HOTEL = MA.ID_HOTEL
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2, 3,28)
+
+) MA,
+
+
+
+(SELECT COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,MA.ID_CHECKIN))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_CHECKIN,NULL)) CORTESIA
+FROM CHECKIN C, MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, CONTROLA_DATA H
+WHERE TL.ID_IDENTIFICA_LANCAMENTO IN (2, 26,3)
+AND trunc(MA.DATA_LANCAMENTO) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL = $P{IDH}
+AND MA.ID_HOTEL = H.ID_HOTEL
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND C.CORTESIA  = 'S'
+AND C.ID_HOTEL = MA.ID_HOTEL
+AND C.ID_CHECKIN = MA.ID_CHECKIN
+
+) B,
+
+
+(SELECT
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL,MA.ID_CHECKIN)))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_CHECKIN,NULL)) GRUPO,
+NVL(ABS(SUM(MA.VALOR_LANCAMENTO)), 0) DIARIA_GRUPO
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, CHECKIN CK, RESERVA R
+WHERE TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2, 3,28)
+AND trunc(MA.DATA_LANCAMENTO) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL =$P{IDH}
+AND ck.ID_HOTEL =$P{IDH}
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND MA.ID_CHECKIN = CK.ID_CHECKIN
+AND CK.ID_RESERVA = R.ID_RESERVA AND R.GRUPO='S') C
+
+GROUP BY MA.RECEITA_DIARIA,MA.OCUPADOS,MA.HOSPEDE,MA.CRIANCAS,B.CORTESIA, C.GRUPO, C.DIARIA_GRUPO, MA.CAFES, MA.VALOR_CAFE_DIA
+) C,
+
+--Tabela
+(SELECT
+COUNT(DUAL.DUMMY),
+MA.RECEITA_DIARIA,
+MA.OCUPADOS OCUPADOS_ACUMULADO,
+MA.HOSPEDE HOSPEDE_ACUMULADO,
+C.GRUPO GRUPO_ACUMULADO,
+MA.CRIANCAS CRIANCAS_ACUMULADO,
+MA.CAFES CAFE_ACUMULADO,
+B.CORTESIA CORTESIA_ACUMULADO,
+C.DIARIA_GRUPO DIARIA_GRUPO_ACUMULADO,
+MA.VALOR_CAFE_ACM
+FROM DUAL,
+
+(SELECT
+/*+INDEX( MOVIMENTO_APARTAMENTO IDX_MOV_APTO_LANC )*/
+SUM(NVL(MA.VALOR_LANCAMENTO,0)) RECEITA_DIARIA,
+
+COUNT((DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL, MA.ID_MOVIMENTO_APARTAMENTO))))
+-
+COUNT((DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_MOVIMENTO_APARTAMENTO,NULL)))OCUPADOS,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_ADULTOS,MA.QTDE_ADULTOS)),0) HOSPEDE,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_CRIANCAS,MA.QTDE_CRIANCAS)),0) CRIANCAS,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_CAFE,MA.QTDE_CAFE) ),0) CAFES,
+
+NVL(SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,-MA.QTDE_CAFE,MA.QTDE_CAFE) * VC.VALOR_CAFE ),0)  VALOR_CAFE_ACM
+
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, CHECKIN C,
+
+(select id_hotel, data, valor_cafe, d2
+from valor_cafe vc, tipo_pensao tp
+where vc.id_tipo_pensao = tp.id_tipo_pensao and id_hotel = $P{IDH} and data = to_date($P{P_DATA},'dd/mm/yyyy') and tp.ID_TIPO_PENSAO = 1) vc
+
+WHERE MA.ID_CHECKIN = C.ID_CHECKIN
+AND MA.ID_HOTEL = C.ID_HOTEL
+--AND trunc(MA.DATA_LANCAMENTO) BETWEEN trunc(C.DATA_ENTRADA) AND trunc(C.DATA_SAIDA)
+AND MA.ID_HOTEL = $P{IDH}
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_HOTEL = MA.ID_HOTEL
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2, 3,28)
+) MA,
+
+
+(SELECT COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,MA.ID_CHECKIN))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_CHECKIN,NULL)) CORTESIA
+FROM CHECKIN C, MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, CONTROLA_DATA H
+WHERE TL.ID_IDENTIFICA_LANCAMENTO IN (2, 26,3)
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL = $P{IDH}
+AND MA.ID_HOTEL = H.ID_HOTEL
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND C.CORTESIA  = 'S'
+AND C.ID_HOTEL = MA.ID_HOTEL
+AND C.ID_CHECKIN = MA.ID_CHECKIN
+
+
+) B,
+
+
+(SELECT
+
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL,MA.ID_CHECKIN)))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_CHECKIN,NULL)) GRUPO,
+NVL(ABS(SUM(MA.VALOR_LANCAMENTO)), 0) DIARIA_GRUPO
+FROM MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, CHECKIN CK, RESERVA R
+WHERE TL.ID_IDENTIFICA_LANCAMENTO IN (26, 2, 3,28)
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH') AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL = $P{IDH}
+AND CK.ID_HOTEL = $P{IDH}
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND MA.ID_CHECKIN = CK.ID_CHECKIN
+AND CK.ID_RESERVA = R.ID_RESERVA AND R.GRUPO='S') C
+GROUP BY
+
+MA.RECEITA_DIARIA,MA.OCUPADOS,MA.HOSPEDE,MA.CRIANCAS,B.CORTESIA, C.GRUPO, C.DIARIA_GRUPO, MA.CAFES, MA.VALOR_CAFE_ACM
+) D,
+
+
+-- O ERRO ESTA AQUI,,, QDO FOR PRA DIVIDIR E FOR 0 COLOCAR O RESULTADO FINAL 0.. CONSULTA ABAIXO É USADA EM ALGUM CALCULO
+--Tabela
+(SELECT
+
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,MA.ID_CHECKIN))
+-
+
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_CHECKIN,NULL))
+SCORTESIA
+FROM CHECKIN C, MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL
+WHERE trunc(MA.DATA_LANCAMENTO) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL = $P{IDH}
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_HOTEL = MA.ID_HOTEL
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (2, 26, 3)
+AND C.CORTESIA = 'N'
+AND C.ID_HOTEL = MA.ID_HOTEL
+AND C.ID_CHECKIN = MA.ID_CHECKIN
+
+
+) E,
+
+--Tabela
+
+(
+SELECT MA.VALOR SCORTESIA_ACUMULADO
+FROM
+
+(SELECT COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,MA.ID_MOVIMENTO_APARTAMENTO))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.ID_MOVIMENTO_APARTAMENTO,NULL))VALOR
+FROM CHECKIN C, MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL
+
+WHERE trunc(MA.DATA_LANCAMENTO) BETWEEN  TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH')AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND MA.ID_HOTEL = $P{IDH}
+AND C.ID_HOTEL = $P{IDH}
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (2, 26, 3)
+AND C.CORTESIA  = 'N'
+AND C.ID_HOTEL = MA.ID_HOTEL
+AND C.ID_CHECKIN = MA.ID_CHECKIN
+
+
+) MA
+) F,
+--Tabela
+
+(
+SELECT COUNT(*) APARTAMENTO_DIA
+FROM APARTAMENTO A
+WHERE A.ID_HOTEL = $P{IDH}
+AND COFAN = 'N'
+)
+G,
+--Tabela
+(SELECT (COUNT(*) * TO_CHAR(to_date($P{P_DATA},'dd/mm/yyyy'), 'DD'))  APARTAMENTO_ACUMULADO
+FROM APARTAMENTO A
+WHERE A.ID_HOTEL = $P{IDH}
+AND COFAN = 'N'
+) H,
+--Tabela
+(SELECT VALOR_DOLAR DOLAR
+FROM VALOR_DOLAR V,
+
+(SELECT MAX(DATA) DATA, ID_HOTEL
+FROM VALOR_DOLAR
+WHERE trunc(DATA) <= to_date($P{P_DATA},'dd/mm/yyyy')
+AND ID_HOTEL =$P{IDH}
+AND ID_MOEDA = 2
+GROUP BY ID_HOTEL) D
+WHERE D.DATA = V.DATA
+AND ID_MOEDA = 2
+AND V.ID_HOTEL = D.ID_HOTEL) I,
+--Tabela
+
+(SELECT  ROUND(NVL(ABS(SUM(MA.VALOR_LANCAMENTO)), 0), 2) RECEITA_TOTAL
+FROM   MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE TL.ID_HOTEL = $P{IDH}
+AND IL.RECEITA_CHECKOUT = 1
+AND trunc(MA.DATA_LANCAMENTO(+)) = to_date($P{P_DATA},'dd/mm/yyyy')
+AND TL.ID_TIPO_LANCAMENTO = MA.ID_TIPO_LANCAMENTO(+)
+AND MA.ID_HOTEL = TL.ID_HOTEL
+AND TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO
+) J,
+--Tabela
+
+(SELECT  ROUND(NVL(ABS(SUM(MA.VALOR_LANCAMENTO)), 0), 2) RECEITA_TOTAL_ACUMULADO
+
+FROM   MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL, IDENTIFICA_LANCAMENTO IL
+WHERE TL.ID_HOTEL = $P{IDH}
+AND IL.RECEITA_CHECKOUT = 1
+AND trunc(MA.DATA_LANCAMENTO(+)) BETWEEN TRUNC(to_date($P{P_DATA},'dd/mm/yyyy'), 'MONTH')AND to_date($P{P_DATA},'dd/mm/yyyy')
+AND TL.ID_TIPO_LANCAMENTO = MA.ID_TIPO_LANCAMENTO(+)
+AND MA.ID_HOTEL = TL.ID_HOTEL
+AND TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO
+) L,
+
+
+(select valor_cafe PENSOES from valor_cafe where id_hotel = $P{IDH} and trunc(data) = to_date($P{P_DATA},'dd/mm/yyyy') ) pensao
+
+
+WHERE A.ID_DIARIA(+)      = TL.ID_TIPO_LANCAMENTO
+AND B.ID_DIARIA_ACUMULADO(+)  = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_HOTEL = $P{IDH}
+
+
+ORDER BY B.RECEITA_CHECKOUT, TL.GRUPO_LANCAMENTO, TL.SUB_GRUPO_LANCAMENTO)WHERE ROWNUM = 1]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal"/>
+	<field name="GRUPO_LANCAMENTO" class="java.lang.String"/>
+	<field name="SUB_GRUPO_LANCAMENTO" class="java.lang.String"/>
+	<field name="DESCRICAO_LANCAMENTO" class="java.lang.String"/>
+	<field name="RECEITA_CHECKOUT" class="java.lang.String"/>
+	<field name="RECEITA_CHECKOUT_B" class="java.lang.String"/>
+	<field name="GRUPO_DIARIA" class="java.lang.String"/>
+	<field name="DIARIA" class="java.math.BigDecimal"/>
+	<field name="DIARIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="HOSPEDE" class="java.math.BigDecimal"/>
+	<field name="CRIANCAS" class="java.math.BigDecimal"/>
+	<field name="CAFE" class="java.math.BigDecimal"/>
+	<field name="CORTESIA" class="java.math.BigDecimal"/>
+	<field name="HOSPEDE_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="CRIANCAS_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="CAFE_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="CORTESIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="SCORTESIA" class="java.math.BigDecimal"/>
+	<field name="SCORTESIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="GRUPO" class="java.math.BigDecimal"/>
+	<field name="MAP" class="java.math.BigDecimal"/>
+	<field name="FAP" class="java.math.BigDecimal"/>
+	<field name="ALL_INCLUSIVE" class="java.math.BigDecimal"/>
+	<field name="AMAP" class="java.math.BigDecimal"/>
+	<field name="AFAP" class="java.math.BigDecimal"/>
+	<field name="AALL" class="java.math.BigDecimal"/>
+	<field name="OCUPADOS" class="java.math.BigDecimal"/>
+	<field name="OCUPADOS_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="GRUPO_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DIARIA_GRUPO" class="java.math.BigDecimal"/>
+	<field name="DIARIA_GRUPO_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DIARIA_TOTAL" class="java.math.BigDecimal"/>
+	<field name="DIARIA_TOTAL_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="RECEITA_TOTAL" class="java.math.BigDecimal"/>
+	<field name="RECEITA_TOTAL_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_RECEITA_TOTAL" class="java.math.BigDecimal"/>
+	<field name="DM_RECEITA_TOTAL_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="INDIVIDUAL" class="java.math.BigDecimal"/>
+	<field name="INDIVIDUAL_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DIARIA_INDIVIDUAL" class="java.math.BigDecimal"/>
+	<field name="DIARIA_INDIV_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="APARTAMENTO_DIA" class="java.math.BigDecimal"/>
+	<field name="APARTAMENTO_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="REVPAR_OCUPADOS_DIA" class="java.math.BigDecimal"/>
+	<field name="REVPAR_OCUPADOS_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_OCUPADOS_DIA" class="java.math.BigDecimal"/>
+	<field name="DM_OCUPADOS_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_SCORTESIA_DIA" class="java.math.BigDecimal"/>
+	<field name="DM_SCORTESIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_CORTESIA_DIA" class="java.math.BigDecimal"/>
+	<field name="DM_CORTESIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_HOSPEDE_DIA" class="java.math.BigDecimal"/>
+	<field name="DM_HOSPEDE_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_GRUPO_DIA" class="java.math.BigDecimal"/>
+	<field name="DM_GRUPO_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DM_INDIVIDUAL_DIA" class="java.math.BigDecimal"/>
+	<field name="DM_INDIVIDUAL_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_OCUPADOS" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_OCUPADOS_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_INDIV" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_INDIV_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_GRUPO" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_GRUPO_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_CORTESIA" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_CORTESIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_SCORTESIA" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL_SCORTESIA_ACUMULADO" class="java.math.BigDecimal"/>
+	<field name="DOLAR" class="java.math.BigDecimal"/>
+	<field name="CAFEDIA" class="java.math.BigDecimal"/>
+	<field name="CAFEMES" class="java.math.BigDecimal"/>
+	<field name="RECEITA_LIQUIDA_DIA" class="java.math.BigDecimal"/>
+	<field name="RECEITA_LIQUIDA_MES" class="java.math.BigDecimal"/>
+	<field name="PENSOES" class="java.lang.Double"/>
+	<group name="GrupoTipo">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="275" splitType="Stretch">
+			<staticText>
+				<reportElement x="14" y="19" width="26" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Geral]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="32" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[RECEITA TOTAL]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="1" width="1" height="264"/>
+			</line>
+			<staticText>
+				<reportElement x="21" y="72" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[RECEITA CAFÉ DA MANHÃ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="82" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[DIÁRIA LÍQUIDA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="62" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[DIÁRIA TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="42" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[DIÁRIA GRUPO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="52" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[DIÁRIA INDIVÍDUAL]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="16" width="571" height="1"/>
+			</line>
+			<line>
+				<reportElement x="1" y="1" width="571" height="1"/>
+			</line>
+			<line>
+				<reportElement x="572" y="1" width="1" height="265"/>
+			</line>
+			<staticText>
+				<reportElement x="265" y="3" width="73" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Pensões do Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="3" width="57" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Dolar do Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="493" y="3" width="16" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[R$]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="98" width="571" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="319" y="19" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="436" y="19" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="498" y="19" width="51" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês Dolar]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="173" width="572" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="14" y="103" width="102" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantidade Apartamentos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="164" y="103" width="27" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="103" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<line>
+				<reportElement x="261" y="98" width="1" height="167"/>
+			</line>
+			<line>
+				<reportElement x="0" y="265" width="572" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="14" y="178" width="102" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantidade Hóspedes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="178" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="178" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="307" y="103" width="51" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[% Ocupação]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="513" y="103" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="461" y="103" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="178" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="403" y="178" width="26" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="178" width="83" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Diária Média]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="511" y="178" width="42" height="9"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mês Dolar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="119" width="118" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS OCUPADOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="129" width="118" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS SEM CORTESIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="159" width="118" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS INDIVIDUAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="149" width="118" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS GRUPO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="139" width="118" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS COM CORTESIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="240" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[ALL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="190" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[HÓSPEDE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="200" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[CRIANÇA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="230" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[FAP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="220" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[MAP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="21" y="210" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[CAFÉ DA MANHÃ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="118" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[OCUPAÇÃO TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="129" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[OCUPAÇÃO SEM CORTESIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="161" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[OCUPAÇÃO INDIVIDUAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="150" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[OCUPAÇÃO GRUPO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="140" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[OCUPAÇÃO CORTESIAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="231" width="115" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTO INDIVIDUAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="211" width="115" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS SEM CORTESIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="190" width="115" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS OCUPADOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="251" width="115" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[MÉDIA SOBRE RECEITA TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="241" width="115" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[HÓSPEDE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="221" width="115" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[APARTAMENTOS GRUPO]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="252" y="32" width="93" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEITA_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="365" y="32" width="97" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEITA_TOTAL_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="477" y="32" width="72" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEITA_TOTAL_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="165" y="210" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAFE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="217" y="210" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAFE_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="252" y="82" width="93" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="365" y="82" width="97" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="477" y="82" width="72" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="252" y="62" width="93" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="365" y="62" width="97" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_TOTAL_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="477" y="62" width="72" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_TOTAL_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="252" y="52" width="93" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_INDIVIDUAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="365" y="52" width="97" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_INDIV_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="477" y="52" width="72" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_INDIV_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="252" y="72" width="93" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAFEDIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="365" y="72" width="97" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAFEMES}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="477" y="72" width="72" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAFEMES} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="252" y="42" width="93" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="365" y="42" width="97" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_GRUPO_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="477" y="42" width="72" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIA_GRUPO_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="159" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INDIVIDUAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="159" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INDIVIDUAL_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="164" y="119" width="27" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCUPADOS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="119" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OCUPADOS_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="164" y="129" width="27" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCORTESIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="129" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCORTESIA_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="164" y="139" width="27" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CORTESIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="139" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CORTESIA_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="164" y="149" width="27" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="149" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GRUPO_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="190" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="190" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HOSPEDE_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="200" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CRIANCAS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="200" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CRIANCAS_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="220" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MAP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="230" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FAP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="220" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMAP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="230" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AFAP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="240" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ALL_INCLUSIVE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="240" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AALL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="461" y="118" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_OCUPADOS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="513" y="118" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_OCUPADOS_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="539" y="118" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="118" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="461" y="129" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_SCORTESIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="513" y="129" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_SCORTESIA_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="461" y="140" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_CORTESIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="513" y="140" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_CORTESIA_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="539" y="129" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="129" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="539" y="140" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="140" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="461" y="150" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="513" y="150" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_GRUPO_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="461" y="161" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_INDIV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="513" y="161" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL_INDIV_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="539" y="161" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="161" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="539" y="150" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="151" width="10" height="10"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="241" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_HOSPEDE_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="241" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_HOSPEDE_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="190" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_OCUPADOS_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="190" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_OCUPADOS_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="211" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_SCORTESIA_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="211" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_SCORTESIA_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="231" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_INDIVIDUAL_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="231" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_INDIVIDUAL_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="221" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_GRUPO_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="221" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_GRUPO_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="512" y="190" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_OCUPADOS_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="512" y="211" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_SCORTESIA_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="512" y="221" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_GRUPO_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="512" y="231" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_INDIVIDUAL_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="512" y="241" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DM_HOSPEDE_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="251" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEITA_TOTAL}/($F{OCUPADOS}.intValue()==0?1:$F{OCUPADOS})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="251" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEITA_TOTAL_ACUMULADO}/
+($F{OCUPADOS_ACUMULADO}.intValue()==0?1:$F{OCUPADOS_ACUMULADO})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="512" y="251" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEITA_TOTAL_ACUMULADO}/
+($F{OCUPADOS_ACUMULADO}.intValue()==0?1:$F{OCUPADOS_ACUMULADO})/
+($F{DOLAR}.intValue()==0?1:$F{DOLAR})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="510" y="3" width="49" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOLAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="358" y="3" width="50" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PENSOES}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="342" y="3" width="16" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[R$]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="281" y="200" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[REVPAR]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="403" y="200" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REVPAR_OCUPADOS_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="455" y="200" width="26" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REVPAR_OCUPADOS_ACUMULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="512" y="200" width="41" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REVPAR_OCUPADOS_ACUMULADO} /$F{DOLAR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

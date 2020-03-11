@@ -1,0 +1,35 @@
+<%@ page contentType="text/html;charset=iso-8859-1"%>
+<%@taglib prefix="s" uri="/struts-tags" %>
+<jsp:scriptlet>
+	String url = request.getRequestURL().toString().substring(0, request.getRequestURL().toString().indexOf(request.getContextPath())+request.getContextPath().length()+1);
+	url = "reportAction";
+    String  base = request.getRequestURL().toString().substring(0, request.getRequestURL().toString().indexOf(request.getContextPath())+request.getContextPath().length()+1);
+</jsp:scriptlet>
+
+<html>
+
+<head>
+<base href="<%=base%>" />
+<title>MozartReports</title>
+<link href="css/mozartReport.css" rel="stylesheet" type="text/css" media="all" />
+<link href="css/modal.css" rel="stylesheet" type="text/css" media="all" />
+<script src='js/jquery-1.3.2.js' type='text/javascript' language='JavaScript1.2'></script>
+<script src='js/jquery-modal-1.3.js' type='text/javascript' language='JavaScript1.2'></script>
+<script src='js/mozartReport.js' type='text/javascript' language='JavaScript1.2'></script>
+</head>
+
+<body>
+	<form action="<%=url%>" method="post">
+		<input type="hidden" size="80" name="strParametros" id="strParametros" value="<%=request.getParameter("PARAMS")%>" />
+		<input type="hidden" size="80" name="report" value="<%=request.getParameter("REPORT")%>" />
+		<input type="hidden" size="80" name="format" value="<%=request.getParameter("FORMAT")%>" />
+		<input type="hidden" size="80" name="contentType" value="<%=request.getParameter("CONTENTTYPE")%>" />
+	</form>
+</body>	
+
+<script>
+	loading();
+	document.forms[0].submit();
+</script>
+
+</html>	

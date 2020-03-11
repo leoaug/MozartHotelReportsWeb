@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="empresaCreditoDetalheReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="ID_EMP" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TIPO" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Empresa Crédito Detalhe"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT * FROM (
+/*vencidas*/
+SELECT 1 TIPO,'Duplicatas vencidas' tiulo ,H.ID_HOTEL, D.ID_EMPRESA, NULL ID_CHECKIN, NULL ID_RESERVA, D.NUM_DUPLICATA NUMERO, H.SIGLA SIGLA_HOTEL, EH.NOME_FANTASIA, D.PRORROGADO,  D.DATA_LANCAMENTO, (D.VALOR_DUPLICATA - D.COMISSAO - NVL(D.AJUSTES,0) - NVL(D.ENCARGOS,0) + NVL(D.IR,0)) VALOR
+FROM DUPLICATA D, EMPRESA_REDE EH, CONTROLA_DATA CD, HOTEL H
+WHERE EH.ID_REDE_HOTEL = $P{IDRH}
+AND CD.ID_REDE_HOTEL = EH.ID_REDE_HOTEL
+AND D.ID_EMPRESA = EH.ID_EMPRESA
+AND CD.ID_HOTEL  = D.ID_HOTEL
+AND CD.ID_HOTEL = H.ID_HOTEL
+AND D.DATA_RECEBIMENTO IS NULL
+AND D.PRORROGADO < CD.FRONT_OFFICE
+AND EH.ID_EMPRESA = $P{ID_EMP}
+UNION ALL
+/*abertas*/
+SELECT 2 TIPO, 'Duplicatas abertas' tiulo, H.ID_HOTEL, D.ID_EMPRESA, NULL ID_CHECKIN, NULL ID_RESERVA, D.NUM_DUPLICATA NUMERO, H.SIGLA SIGLA_HOTEL, EH.NOME_FANTASIA, D.PRORROGADO,  D.DATA_LANCAMENTO, (D.VALOR_DUPLICATA - D.COMISSAO - NVL(D.AJUSTES,0) - NVL(D.ENCARGOS,0) + NVL(D.IR,0)) VALOR
+FROM DUPLICATA D, EMPRESA_REDE EH, CONTROLA_DATA CD, HOTEL H
+WHERE EH.ID_REDE_HOTEL = $P{IDRH}
+AND CD.ID_REDE_HOTEL = EH.ID_REDE_HOTEL
+AND D.ID_EMPRESA = EH.ID_EMPRESA
+AND CD.ID_HOTEL  = D.ID_HOTEL
+AND CD.ID_HOTEL = H.ID_HOTEL
+AND D.DATA_RECEBIMENTO IS NULL
+AND D.PRORROGADO >= CD.FRONT_OFFICE
+AND EH.ID_EMPRESA = $P{ID_EMP}
+UNION ALL
+/*RESERVA*/
+SELECT /*+ INDEX(R IDX_RESERVA_REDE_HOTEL)*/
+3 TIPO, 'Reservas' titulo,H.ID_HOTEL, R.ID_EMPRESA,  null id_checkin, R.ID_RESERVA, null NUMERO, H.SIGLA SIGLA_HOTEL, ER.NOME_FANTASIA, RA.DATA_ENTRADA, RA.DATA_SAIDA, SUM(NVL(RAD.TARIFA,0)) VALOR
+FROM HOTEL H, EMPRESA_REDE ER, RESERVA R, (SELECT /*+ INDEX(RESERVA_APARTAMENTO IDX_RES_APTO_REDE_HOTEL)*/ * FROM RESERVA_APARTAMENTO ) RA, RESERVA_APARTAMENTO_DIARIA RAD
+WHERE H.ID_REDE_HOTEL = $P{IDRH}
+AND ER.ID_REDE_HOTEL = H.ID_REDE_HOTEL
+AND R.ID_HOTEL = H.ID_HOTEL
+AND R.ID_EMPRESA = ER.ID_EMPRESA
+AND ER.ID_EMPRESA = $P{ID_EMP}
+AND RA.ID_RESERVA = R.ID_RESERVA
+AND RA.ID_HOTEL = R.ID_HOTEL
+AND RA.QTDE_CHECKIN = 0
+AND RAD.ID_RESERVA_APARTAMENTO = RA.ID_RESERVA_APARTAMENTO
+AND RAD.ID_HOTEL = R.ID_HOTEL
+AND R.APAGADA = 'N'
+AND R.ID_RESERVA_BLOQUEIO IS NULL
+AND H.ATIVO = 'S'
+GROUP BY 3, H.ID_HOTEL, R.ID_EMPRESA,  null, R.ID_RESERVA,  NULL, H.SIGLA, ER.NOME_FANTASIA, RA.DATA_ENTRADA, RA.DATA_SAIDA
+UNION ALL
+/*CHECKINS */
+SELECT 4 TIPO, 'Check-ins' titulo, H.ID_HOTEL, CH.ID_EMPRESA, CH.ID_CHECKIN, RA.ID_RESERVA, A.NUM_APARTAMENTO||'' NUMERO, H.SIGLA SIGLA_HOTEL, ER.NOME_FANTASIA, RA.DATA_ENTRADA, RA.DATA_SAIDA, SUM(NVL(RAD.TARIFA,0)) VALOR
+FROM HOTEL H, CHECKIN CH, APARTAMENTO A , RESERVA_APARTAMENTO RA, RESERVA_APARTAMENTO_DIARIA RAD, EMPRESA_REDE ER
+WHERE H.ID_REDE_HOTEL = $P{IDRH}
+AND CH.ID_HOTEL = H.ID_HOTEL
+AND CH.ID_EMPRESA = ER.ID_EMPRESA
+AND ER.ID_EMPRESA = $P{ID_EMP}
+AND H.ID_REDE_HOTEL = ER.ID_REDE_HOTEL
+AND CH.ID_APARTAMENTO = A.ID_APARTAMENTO
+AND CH.ID_HOTEL = A.ID_HOTEL
+AND CH.ID_RESERVA_APARTAMENTO = RA.ID_RESERVA_APARTAMENTO
+AND CH.ID_HOTEL = RA.ID_HOTEL
+AND RAD.ID_HOTEL = RA.ID_HOTEL
+AND RAD.ID_RESERVA_APARTAMENTO = RA.ID_RESERVA_APARTAMENTO
+AND A.COFAN = 'N'
+AND CH.CHECKOUT = 'N'
+AND H.ATIVO = 'S'
+GROUP BY 4, H.ID_HOTEL, CH.ID_EMPRESA, CH.ID_CHECKIN, RA.ID_RESERVA,A.NUM_APARTAMENTO||'', H.SIGLA, ER.NOME_FANTASIA, RA.DATA_ENTRADA, RA.DATA_SAIDA
+)WHERE TIPO = NVL ($P{TIPO}, TIPO)]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TIULO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_HOTEL" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_EMPRESA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_CHECKIN" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_RESERVA" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NUMERO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SIGLA_HOTEL" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NOME_FANTASIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="PRORROGADO" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA_LANCAMENTO" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="VALOR_TOTAL" class="java.lang.Double" resetType="Group" resetGroup="empresaCreditoDetalheGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALOR}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="empresaCreditoDetalheGroup" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupHeader>
+			<band height="35">
+				<line>
+					<reportElement x="0" y="17" width="573" height="1"/>
+				</line>
+				<textField>
+					<reportElement x="234" y="18" width="79" height="14">
+						<printWhenExpression><![CDATA[new Boolean ($F{TIPO}.longValue() != 3)]]></printWhenExpression>
+					</reportElement>
+					<textElement markup="none">
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{TIPO}.longValue()== 4 ? "Num Apto":"Num Duplicata"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="2" width="122" height="13" forecolor="#000066"/>
+					<textElement textAlignment="Left">
+						<font isBold="true" isItalic="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{TIULO}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="2" y="18" width="83" height="14"/>
+					<textElement>
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Hotel]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="317" y="18" width="90" height="14"/>
+					<textElement textAlignment="Center">
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Data Lançamento]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="416" y="18" width="66" height="14"/>
+					<textElement textAlignment="Center">
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Vencimento]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="87" y="18" width="72" height="14">
+						<printWhenExpression><![CDATA[new Boolean($F{TIPO}.longValue()== 3 || $F{TIPO}.longValue() == 4)]]></printWhenExpression>
+					</reportElement>
+					<textElement>
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Num Reserva]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="160" y="18" width="72" height="14">
+						<printWhenExpression><![CDATA[new Boolean($F{TIPO}.longValue() == 4)]]></printWhenExpression>
+					</reportElement>
+					<textElement>
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Num Checkin]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="494" y="18" width="77" height="14"/>
+					<textElement textAlignment="Right">
+						<font fontName="SansSerif" size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Valor]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="32" width="573" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="494" y="1" width="77" height="14"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{VALOR_TOTAL}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="459" y="1" width="34" height="14"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total: ]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="87" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="87"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="2" y="0" width="83" height="14"/>
+				<textElement>
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SIGLA_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="234" y="0" width="79" height="14">
+					<printWhenExpression><![CDATA[new Boolean ($F{TIPO}.longValue() != 3)]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NUMERO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="317" y="0" width="90" height="14"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{DATA_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="416" y="0" width="67" height="14"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{PRORROGADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="494" y="0" width="77" height="14"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{VALOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="87" y="0" width="72" height="14">
+					<printWhenExpression><![CDATA[new Boolean($F{TIPO}.longValue()== 3 || $F{TIPO}.longValue() == 4)]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ID_RESERVA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="0" width="72" height="14">
+					<printWhenExpression><![CDATA[new Boolean($F{TIPO}.longValue() == 4)]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ID_CHECKIN}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="485" y="2" width="34" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="543" y="2" width="12" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="520" y="2" width="16" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="558" y="2" width="14" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="1" width="573" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

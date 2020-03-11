@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rdsGroupReport3" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT * FROM (
+SELECT 1 TIPO,
+C.ID_CHECKIN,  ER.NOME_FANTASIA, AP.NUM_APARTAMENTO, HOS.NOME_HOSPEDE, HOS.SOBRENOME_HOSPEDE,
+TO_CHAR(LOG.HORA,'HH24:MI:SS') HORA, TH.TIPO_HOSPEDE
+FROM
+CHECKIN C
+JOIN LOG_USUARIO LOG ON (C.ID_CHECKIN = LOG.ID_AUDITADO AND UPPER(SUBSTR(LOG.OPERACAO, 1, 3)) = 'INC' )
+JOIN ROOM_LIST RL ON (RL.ID_CHECKIN = C.ID_CHECKIN and RL.DATA_SAIDA IS NULL AND RL.PRINCIPAL = 'S')
+JOIN HOSPEDE HOS ON (RL.ID_HOSPEDE = HOS.ID_HOSPEDE)
+JOIN APARTAMENTO AP ON (C.ID_APARTAMENTO = AP.ID_APARTAMENTO)
+JOIN TIPO_HOSPEDE TH ON (HOS.ID_TIPO_HOSPEDE = TH.ID_TIPO_HOSPEDE)
+JOIN HOTEL HOT ON (HOT.ID_HOTEL = C.ID_HOTEL)
+JOIN EMPRESA_REDE ER ON (HOT.ID_REDE_HOTEL = ER.ID_REDE_HOTEL AND C.ID_EMPRESA = ER.ID_EMPRESA)
+JOIN (SELECT ID_CHECKIN FROM CHECKIN
+WHERE ID_HOTEL = $P{IDH} AND to_date($P{P_DATA},'dd/mm/yyyy') BETWEEN trunc(DATA_ENTRADA) AND trunc(DATA_SAIDA) AND ROWNUM <= 10
+ORDER BY ID_CHECKIN) C2 ON (C2.ID_CHECKIN = C.ID_CHECKIN AND C.ID_HOTEL = $P{IDH} AND to_date($P{P_DATA},'dd/mm/yyyy') BETWEEN trunc(C.DATA_ENTRADA) AND trunc(C.DATA_SAIDA))
+WHERE AP.COFAN = 'N'
+
+
+UNION ALL
+
+SELECT 2 TIPO,
+C.ID_CHECKIN,  ER.NOME_FANTASIA, AP.NUM_APARTAMENTO, HOS.NOME_HOSPEDE, HOS.SOBRENOME_HOSPEDE,
+ TO_CHAR(LOG.HORA,'HH24:MI:SS') HORA, TH.TIPO_HOSPEDE
+FROM
+CHECKIN C
+JOIN LOG_USUARIO LOG ON (C.ID_CHECKIN = LOG.ID_AUDITADO AND UPPER(SUBSTR(LOG.OPERACAO, 1, 3)) = 'INC' )
+JOIN ROOM_LIST RL ON (RL.ID_CHECKIN = C.ID_CHECKIN and RL.DATA_SAIDA IS NULL AND RL.PRINCIPAL = 'S')
+JOIN HOSPEDE HOS ON (RL.ID_HOSPEDE = HOS.ID_HOSPEDE)
+JOIN APARTAMENTO AP ON (C.ID_APARTAMENTO = AP.ID_APARTAMENTO)
+JOIN HOTEL HOT ON (HOT.ID_HOTEL = C.ID_HOTEL)
+JOIN EMPRESA_REDE ER ON (HOT.ID_REDE_HOTEL = ER.ID_REDE_HOTEL AND C.ID_EMPRESA = ER.ID_EMPRESA)
+JOIN TIPO_HOSPEDE TH ON (HOS.ID_TIPO_HOSPEDE = TH.ID_TIPO_HOSPEDE AND TH.PADRAO = 0)
+WHERE C.ID_HOTEL = $P{IDH} AND to_date($P{P_DATA},'dd/mm/yyyy') BETWEEN TRUNC(RL.DATA_ENTRADA) AND TRUNC(RL.DATA_SAIDA)AND AP.COFAN = 'N'
+
+)C
+ORDER BY TIPO, C.ID_CHECKIN, C.HORA]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal"/>
+	<field name="ID_CHECKIN" class="java.math.BigDecimal"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="NUM_APARTAMENTO" class="java.math.BigDecimal"/>
+	<field name="NOME_HOSPEDE" class="java.lang.String"/>
+	<field name="SOBRENOME_HOSPEDE" class="java.lang.String"/>
+	<field name="HORA" class="java.lang.String"/>
+	<field name="TIPO_HOSPEDE" class="java.lang.String"/>
+	<group name="rdsGroupReport">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupHeader>
+			<band height="34">
+				<textField>
+					<reportElement x="1" y="2" width="148" height="15"/>
+					<textElement markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TIPO}.toString().equals("1")?"Checkin - Os últimos 10 dias":"Os Hóspedes Especiais"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="72" y="16" width="42" height="14"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Nome]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="178" y="16" width="64" height="14"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Sobrenome]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="311" y="16" width="64" height="14"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Empresa]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="421" y="16" width="56" height="14"/>
+					<textElement textAlignment="Left">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Tipo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="3" y="16" width="42" height="14"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Nº Apart]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="490" y="16" width="65" height="14"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Horas]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="1" width="554" height="1"/>
+				</line>
+				<line>
+					<reportElement x="0" y="32" width="554" height="1"/>
+					<graphicElement>
+						<pen lineWidth="2.0"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="7"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="420" y="1" width="57" height="10"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH.mm">
+				<reportElement x="489" y="1" width="65" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HORA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="1" width="95" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="1" width="101" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SOBRENOME_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="1" width="96" height="10"/>
+				<textElement>
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="1" width="42" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_APARTAMENTO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

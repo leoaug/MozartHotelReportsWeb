@@ -1,0 +1,973 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="notasHospedagemReport" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isFloatColumnFooter="true">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="ID_NOTA" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATA_NOTA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    SN.ID_NOTA,
+    H.RAZAO_SOCIAL RAZAO_SOCIAL_HOTEL,
+    RTRIM(H.ENDERECO)||','||H.NUMERO||' - '||H.COMPLEMENTO ENDERECO_HOTEL,
+    H.BAIRRO BAIRRO_HOTEL,
+    H.CGC CNPJ_HOTEL,
+    H.AIDF,
+    C_DO_HOTEL.CIDADE CIDADE_HOTEL,
+    UF_DO_HOTEL.UF UF_HOTEL,
+    H.CEP CEP_HOTEL,
+    C_DO_HOTEL.DDD DDD_HOTEL,
+    H.TELEFONE TELEFONE_HOTEL,
+    H.EMAIL EMAIL_HOTEL,
+    H.SITE SITE_HOTEL,
+    H.INSC_MUNICIPAL INSC_MUN_HOTEL,
+    SN.NOTA_INICIAL,
+    SN.SERIE,
+    TO_CHAR(SN.DATA,'DD/MM/YYYY') DATA_EMISSAO,
+    TO_CHAR(SN.DATA,'HH24:MM') HORA_EMISSAO,
+    E_DA_PREFEITURA.RAZAO_SOCIAL RAZAO_SOCIAL_PREFEITURA,
+    E_DA_PREFEITURA.ENDERECO ENDERECO_PREFEITURA,
+    E_DA_PREFEITURA.NUMERO NUMERO_PREFEITURA,
+    E_DA_PREFEITURA.COMPLEMENTO COMPLEMENTO_PREFEITURA,
+    C_DA_PREFEITURA.CIDADE CIDADE_PREFEITURA,
+    UF_DA_PREFEITURA.UF UF_PREFEITURA,
+    E_DA_PREFEITURA.CEP CEP_PREFEITURA,
+    E_DA_PREFEITURA.CGC CNPJ_PREFEITURA,
+    C_DA_PREFEITURA.DDD DDD_PREFEITURA,
+    FR_DA_PREFEITURA.TELEFONE_1 TELEFONE_PREFEITURA,
+    MA.VALOR_LANCAMENTO TOTAL,
+    TL.DESCRICAO_LANCAMENTO,
+    TL.GRUPO_LANCAMENTO,
+    IL.RECEITA_CHECKOUT,
+    TLG.DESCRICAO_LANCAMENTO GRUPO_DESCRICAO,
+    SN.BASE_CALCULO BASE_CALCULO,
+    SN.ISS VALOR_ISS,
+    SN.ALIQUOTA_ISS ALIQUOTA,
+    H.CODIGO_SERVICO,
+    C_DO_HOTEL.CODIGO_IBGE CODIGO_MUNICIPIO,
+    DECODE(SN.QUEM_PAGA,'E', E.RAZAO_SOCIAL, HO.NOME_HOSPEDE) NOME_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', E.CGC, HO.CPF) CPF_CNPJ_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', RTRIM(E.ENDERECO)||','||E.NUMERO||' - '||E.COMPLEMENTO, HO.ENDERECO) ENDERECO_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', E.NUMERO, HO.NUMERO) NUMERO_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', E.COMPLEMENTO, HO.COMPLEMENTO) COMPLEMENTO_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', E.BAIRRO, HO.BAIRRO) BAIRRO_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', C_DA_EMPRESA.CiDADE, C_DO_HOSPEDE.CIDADE) CIDADE_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', C_DA_EMPRESA.CODIGO_IBGE, C_DO_HOSPEDE.CODIGO_IBGE) CODIGO_MUN_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', UF_DA_EMPRESA.UF, UF_DO_HOSPEDE.UF) UF_TOMADOR  ,
+    DECODE(SN.QUEM_PAGA,'E', TO_CHAR(REPLACE(E.CEP,'-')), TO_CHAR(REPLACE(HO.CEP,'-'))) CEP_TOMADOR,
+    DECODE(SN.QUEM_PAGA,'E', E.INSC_MUNICIPAL,0) INSC_MUNICIPAL_TOMADOR,
+    CI.ID_RESERVA,
+    AP.NUM_APARTAMENTO,
+    SN.NUM_NOTA NOTA_HOSPEDAGEM
+FROM STATUS_NOTA SN
+JOIN HOTEL H ON (SN.ID_HOTEL = H.ID_HOTEL)
+JOIN CHECKIN CI ON (SN.ID_CHECKIN = CI.ID_CHECKIN)
+JOIN APARTAMENTO AP ON (CI.ID_APARTAMENTO = AP.ID_APARTAMENTO)
+JOIN MOVIMENTO_APARTAMENTO MA ON (SN.ID_NOTA = MA.ID_NOTA)
+JOIN TIPO_LANCAMENTO TL ON (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO)
+JOIN IDENTIFICA_LANCAMENTO IL ON (TL.ID_IDENTIFICA_LANCAMENTO = IL.ID_IDENTIFICA_LANCAMENTO)
+JOIN TIPO_LANCAMENTO TLG ON (TL.GRUPO_LANCAMENTO = TLG.GRUPO_LANCAMENTO AND TLG.SUB_GRUPO_LANCAMENTO = '000' AND MA.ID_HOTEL = TLG.ID_HOTEL )
+JOIN CIDADE C_DO_HOTEL ON (H.ID_CIDADE = C_DO_HOTEL.ID_CIDADE)
+JOIN ESTADO UF_DO_HOTEL ON (C_DO_HOTEL.ID_ESTADO = UF_DO_HOTEL.ID_ESTADO)
+JOIN EMPRESA E_DA_PREFEITURA ON (H.ID_FORNECEDOR_PREFEITURA = E_DA_PREFEITURA.ID_EMPRESA)
+JOIN FORNECEDOR_REDE FR_DA_PREFEITURA ON (H.ID_REDE_HOTEL = FR_DA_PREFEITURA.ID_REDE_HOTEL AND E_DA_PREFEITURA.ID_EMPRESA = FR_DA_PREFEITURA.ID_FORNECEDOR)
+JOIN CIDADE C_DA_PREFEITURA ON (E_DA_PREFEITURA.ID_CIDADE = C_DA_PREFEITURA.ID_CIDADE)
+JOIN ESTADO UF_DA_PREFEITURA ON (C_DA_PREFEITURA.ID_ESTADO = UF_DA_PREFEITURA.ID_ESTADO)
+JOIN EMPRESA E ON (SN.ID_EMPRESA = E.ID_EMPRESA)
+LEFT OUTER JOIN HOSPEDE HO ON (SN.ID_HOSPEDE = HO.ID_HOSPEDE)
+LEFT OUTER JOIN CIDADE C_DO_HOSPEDE ON (HO.ID_CIDADE = C_DO_HOSPEDE.ID_CIDADE)
+LEFT OUTER JOIN ESTADO UF_DO_HOSPEDE ON (C_DO_HOSPEDE.ID_ESTADO = UF_DO_HOSPEDE.ID_ESTADO)
+LEFT OUTER JOIN CIDADE C_DA_EMPRESA ON (E.ID_CIDADE = C_DA_EMPRESA.ID_CIDADE)
+LEFT OUTER JOIN ESTADO UF_DA_EMPRESA ON (C_DA_EMPRESA.ID_ESTADO = UF_DA_EMPRESA.ID_ESTADO)
+WHERE SN.ID_HOTEL = $P{IDH}
+AND TRUNC(SN.DATA)  = $P{DATA_NOTA}
+AND SN.ID_NOTA = $P{ID_NOTA}
+AND SN.TIPO_NOTA = 'F'
+AND IL.RECEITA_CHECKOUT = 1
+AND  TL.ISS_NOTA = 'S'
+ORDER BY TL.GRUPO_LANCAMENTO, TL.SUB_GRUPO_LANCAMENTO, MA.DATA_LANCAMENTO]]>
+	</queryString>
+	<field name="ID_NOTA" class="java.math.BigDecimal"/>
+	<field name="RAZAO_SOCIAL_HOTEL" class="java.lang.String"/>
+	<field name="ENDERECO_HOTEL" class="java.lang.String"/>
+	<field name="BAIRRO_HOTEL" class="java.lang.String"/>
+	<field name="CNPJ_HOTEL" class="java.lang.String"/>
+	<field name="AIDF" class="java.lang.String"/>
+	<field name="CIDADE_HOTEL" class="java.lang.String"/>
+	<field name="UF_HOTEL" class="java.lang.String"/>
+	<field name="CEP_HOTEL" class="java.lang.String"/>
+	<field name="DDD_HOTEL" class="java.lang.String"/>
+	<field name="TELEFONE_HOTEL" class="java.lang.String"/>
+	<field name="EMAIL_HOTEL" class="java.lang.String"/>
+	<field name="SITE_HOTEL" class="java.lang.String"/>
+	<field name="INSC_MUN_HOTEL" class="java.lang.String"/>
+	<field name="NOTA_INICIAL" class="java.math.BigDecimal"/>
+	<field name="SERIE" class="java.lang.String"/>
+	<field name="DATA_EMISSAO" class="java.lang.String"/>
+	<field name="HORA_EMISSAO" class="java.lang.String"/>
+	<field name="RAZAO_SOCIAL_PREFEITURA" class="java.lang.String"/>
+	<field name="ENDERECO_PREFEITURA" class="java.lang.String"/>
+	<field name="NUMERO_PREFEITURA" class="java.lang.String"/>
+	<field name="COMPLEMENTO_PREFEITURA" class="java.lang.String"/>
+	<field name="CIDADE_PREFEITURA" class="java.lang.String"/>
+	<field name="UF_PREFEITURA" class="java.lang.String"/>
+	<field name="CEP_PREFEITURA" class="java.lang.String"/>
+	<field name="CNPJ_PREFEITURA" class="java.lang.String"/>
+	<field name="DDD_PREFEITURA" class="java.lang.String"/>
+	<field name="TELEFONE_PREFEITURA" class="java.lang.String"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="DESCRICAO_LANCAMENTO" class="java.lang.String"/>
+	<field name="GRUPO_LANCAMENTO" class="java.lang.String"/>
+	<field name="RECEITA_CHECKOUT" class="java.lang.String"/>
+	<field name="GRUPO_DESCRICAO" class="java.lang.String"/>
+	<field name="BASE_CALCULO" class="java.math.BigDecimal"/>
+	<field name="VALOR_ISS" class="java.math.BigDecimal"/>
+	<field name="ALIQUOTA" class="java.math.BigDecimal"/>
+	<field name="CODIGO_SERVICO" class="java.lang.String"/>
+	<field name="CODIGO_MUNICIPIO" class="java.math.BigDecimal"/>
+	<field name="NOME_TOMADOR" class="java.lang.String"/>
+	<field name="CPF_CNPJ_TOMADOR" class="java.lang.String"/>
+	<field name="ENDERECO_TOMADOR" class="java.lang.String"/>
+	<field name="NUMERO_TOMADOR" class="java.lang.String"/>
+	<field name="COMPLEMENTO_TOMADOR" class="java.lang.String"/>
+	<field name="BAIRRO_TOMADOR" class="java.lang.String"/>
+	<field name="CIDADE_TOMADOR" class="java.lang.String"/>
+	<field name="CODIGO_MUN_TOMADOR" class="java.math.BigDecimal"/>
+	<field name="UF_TOMADOR" class="java.lang.String"/>
+	<field name="CEP_TOMADOR" class="java.lang.String"/>
+	<field name="INSC_MUNICIPAL_TOMADOR" class="java.lang.String"/>
+	<field name="ID_RESERVA" class="java.math.BigDecimal"/>
+	<field name="NUM_APARTAMENTO" class="java.math.BigDecimal"/>
+	<field name="NOTA_HOSPEDAGEM" class="java.lang.String"/>
+	<variable name="TOTAL_GROUP" class="java.lang.Double" resetType="Group" resetGroup="notasHospedagemGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_GERAL" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="notasHospedagemGroup">
+		<groupExpression><![CDATA[$F{GRUPO_LANCAMENTO}]]></groupExpression>
+		<groupFooter>
+			<band height="14">
+				<line>
+					<reportElement mode="Transparent" x="76" y="0" width="1" height="14"/>
+				</line>
+				<textField>
+					<reportElement x="92" y="1" width="177" height="13"/>
+					<textElement>
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GRUPO_DESCRICAO}+":"]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="485" y="1" width="44" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_GROUP}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement mode="Transparent" x="31" y="0" width="1" height="14"/>
+				</line>
+				<line>
+					<reportElement mode="Transparent" x="417" y="0" width="1" height="14"/>
+				</line>
+				<line>
+					<reportElement mode="Transparent" x="478" y="0" width="1" height="14"/>
+				</line>
+				<line>
+					<reportElement mode="Transparent" x="0" y="-2" width="1" height="16"/>
+				</line>
+				<line>
+					<reportElement mode="Transparent" x="554" y="0" width="1" height="14"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="106" splitType="Stretch">
+			<textField>
+				<reportElement x="87" y="39" width="330" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RAZAO_SOCIAL_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="136" y="88" width="105" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CNPJ_HOTEL}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="3" y="22" width="73" height="78"/>
+				<imageExpression><![CDATA[$P{LOGO_HOTEL}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="292" y="64" width="82" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TELEFONE_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="278" y="88" width="134" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMAIL_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="275" y="76" width="142" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SITE_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="64" width="105" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="214" y="64" width="17" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UF_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="52" width="167" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BAIRRO_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="87" y="52" width="154" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENDERECO_HOTEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="88" y="76" width="19" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CEP:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="135" y="76" width="58" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CEP_HOTEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="250" y="76" width="20" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Site:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="88" width="42" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[C.N.P.J.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="202" y="64" width="3" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="64" width="15" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tel.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="88" width="27" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Email:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="105" width="553" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="267" y="64" width="5" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[(]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="64" width="5" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[)]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="1" y="16" width="553" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="430" y="21" width="120" height="19"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Número da RPS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="454" y="40" width="75" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTA_INICIAL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="428" y="88" width="61" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Hora Emissão:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="76" width="61" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Data Emissão:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="489" y="76" width="60" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_EMISSAO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm">
+				<reportElement x="489" y="88" width="60" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HORA_EMISSAO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="133" y="-1" width="293" height="17"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Recibo Provisório de Serviço(s) - RPS]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="421" y="17" width="1" height="88"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="554" y="17" width="1" height="88"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="0" y="17" width="1" height="88"/>
+			</line>
+			<textField>
+				<reportElement x="274" y="64" width="12" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DDD_HOTEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="428" y="64" width="61" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[AIDF n°:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="489" y="64" width="60" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AIDF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="154" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="51" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="8" y="138" width="20" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Item]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="0" y="122" width="554" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="426" y="138" width="44" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Valor Item]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="34" y="138" width="30" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Quant.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="92" y="138" width="317" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Discriminação dos(s) Serviço(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="485" y="138" width="44" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Valor]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="0" y="153" width="554" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="9" y="2" width="114" height="13"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prefeitura municipal de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="124" y="2" width="104" height="13"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="241" y="15" width="37" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[C.N.P.J.:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="33" y="39" width="84" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CEP_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="120" y="15" width="3" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="9" y="15" width="108" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENDERECO_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="9" y="39" width="24" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CEP:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="294" y="27" width="82" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TELEFONE_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="241" y="27" width="19" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tel.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="241" y="2" width="196" height="13"/>
+				<textElement>
+					<font size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Secretaria Municipal de Fazenda]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="278" y="15" width="105" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CNPJ_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="9" y="80" width="69" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Cidade:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="52" width="260" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="94" width="100" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CEP_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="9" y="94" width="69" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CEP:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="66" width="260" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENDERECO_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="108" width="130" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CPF_CNPJ_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="80" width="260" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="9" y="66" width="69" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Endereço:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="104" width="76" height="14"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Insc. Municipal:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="80" width="33" height="14"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Estado:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="396" y="80" width="17" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{UF_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="437" y="104" width="98" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INSC_MUNICIPAL_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="9" y="108" width="67" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CNPJ/CPF:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="52" width="83" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Nome do tomador:]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="1" y="137" width="554" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="223" y="123" width="59" height="14"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SERVIÇOS]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="31" y="138" width="1" height="15"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="76" y="138" width="1" height="15"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="417" y="138" width="1" height="15"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="478" y="138" width="1" height="15"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="0" y="0" width="1" height="51"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="554" y="0" width="1" height="51"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="0" y="52" width="1" height="102"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="554" y="53" width="1" height="101"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="128" y="15" width="33" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMERO_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="165" y="15" width="63" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPLEMENTO_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="9" y="27" width="108" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="120" y="27" width="3" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="128" y="27" width="34" height="12"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UF_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="266" y="27" width="5" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[(]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="273" y="27" width="12" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DDD_PREFEITURA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="285" y="27" width="5" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="396" y="66" width="136" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{BAIRRO_TOMADOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="356" y="66" width="33" height="14"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Bairro:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band height="203" splitType="Stretch">
+			<staticText>
+				<reportElement x="234" y="2" width="229" height="13"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[VALOR TOTAL DA PRESTAÇÃO DE SERVIÇOS:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="464" y="1" width="65" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_GERAL}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="16" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="130" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="33" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="65" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="9" y="19" width="83" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Código do Serviço:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="36" y="37" width="94" height="10"/>
+				<textElement textAlignment="Justified">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Total das deduções (R$):]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="37" width="79" height="10"/>
+				<textElement textAlignment="Justified">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Base de Cálculo (R$):]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="37" width="41" height="10"/>
+				<textElement textAlignment="Justified">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Alíquota %:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="453" y="37" width="59" height="10"/>
+				<textElement textAlignment="Justified">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Valor do ISS (R$)]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Transparent" x="161" y="34" width="1" height="31"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="299" y="34" width="1" height="31"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="402" y="34" width="1" height="31"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="3" y="71" width="68" height="12"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Observações:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="71" width="460" height="12"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[- Este documento não pode conter rasuras;]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="83" width="460" height="12"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[- Este RPS não tem validade como documento fiscal;]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="95" width="460" height="14"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[- Este RPS deve ser convertido em nota fiscal eletrônica até o 10o. dia subsequente a data de sua]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="109" width="460" height="14"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[   emissão, não podendo ultrapassar o 5o. dia do mês subsequente ao da prestação de serviço.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="139" width="120" height="19"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Número da RPS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="27" y="158" width="75" height="22"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTA_INICIAL}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement mode="Transparent" x="132" y="131" width="1" height="71"/>
+			</line>
+			<staticText>
+				<reportElement x="133" y="131" width="29" height="15"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Nome:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="151" width="27" height="15"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CPF: ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="308" y="182" width="85" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_HOTEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="398" y="182" width="68" height="12"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[, ___/___/______]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="202" width="555" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="99" y="19" width="112" height="14"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CODIGO_SERVICO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="206" y="47" width="72" height="14"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BASE_CALCULO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="347" y="47" width="27" height="14"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ALIQUOTA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="466" y="47" width="30" height="14"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_ISS}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement mode="Transparent" x="0" y="1" width="1" height="201"/>
+			</line>
+			<line>
+				<reportElement mode="Transparent" x="554" y="0" width="1" height="203"/>
+			</line>
+			<line>
+				<reportElement x="165" y="145" width="364" height="1"/>
+			</line>
+			<line>
+				<reportElement x="165" y="166" width="101" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="282" y="151" width="51" height="15"/>
+				<textElement textAlignment="Justified">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Assinatura: ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="333" y="165" width="196" height="1"/>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Immediate"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="62">
+			<subreport>
+				<reportElement x="-1" y="1" width="555" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

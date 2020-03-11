@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rdsAnualSubTotalReport" language="groovy" pageWidth="870" pageHeight="555" orientation="Landscape" columnWidth="870" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_GRUPO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select ANO, SUM (MES1)TOTAL1, SUM (MES2)TOTAL2, SUM (MES3)TOTAL3, SUM (MES4)TOTAL4, SUM (MES5)TOTAL5, SUM (MES6)TOTAL6,
+SUM (MES7)TOTAL7, SUM (MES8)TOTAL8, SUM (MES9)TOTAL9, SUM (MES10)TOTAL10, SUM (MES11)TOTAL11, SUM (MES12)TOTAL12
+from RDS_ANUAL_TMP
+where id_hotel=$P{IDH}
+
+AND GRUPO = $P{P_GRUPO}
+group by ID_HOTEL, ANO, GRUPO]]>
+	</queryString>
+	<field name="ANO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL1" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL2" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL3" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL4" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL5" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL6" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL7" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL8" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL9" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL10" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL11" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL12" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="V_MEDIA" class="java.lang.Double" resetType="Column">
+		<variableExpression><![CDATA[($F{TOTAL1}==null?new Double(0):new Double(1))+
+($F{TOTAL2}==null?new Double(0):new Double(1))+
+($F{TOTAL3}==null?new Double(0):new Double(1))+
+($F{TOTAL4}==null?new Double(0):new Double(1))+
+($F{TOTAL5}==null?new Double(0):new Double(1))+
+($F{TOTAL6}==null?new Double(0):new Double(1))+
+($F{TOTAL7}==null?new Double(0):new Double(1))+
+($F{TOTAL8}==null?new Double(0):new Double(1))+
+($F{TOTAL9}==null?new Double(0):new Double(1))+
+($F{TOTAL10}==null?new Double(0):new Double(1))+
+($F{TOTAL11}==null?new Double(0):new Double(1))+
+($F{TOTAL12}==null?new Double(0):new Double(1))
+
+]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="V_TOTAL" class="java.lang.Double" resetType="Column">
+		<variableExpression><![CDATA[($F{TOTAL1}==null?new Double(0):$F{TOTAL1})+
+($F{TOTAL2}==null?new Double(0):$F{TOTAL2})+
+($F{TOTAL3}==null?new Double(0):$F{TOTAL3})+
+($F{TOTAL4}==null?new Double(0):$F{TOTAL4})+
+($F{TOTAL5}==null?new Double(0):$F{TOTAL5})+
+($F{TOTAL6}==null?new Double(0):$F{TOTAL6})+
+($F{TOTAL7}==null?new Double(0):$F{TOTAL7})+
+($F{TOTAL8}==null?new Double(0):$F{TOTAL8})+
+($F{TOTAL9}==null?new Double(0):$F{TOTAL9})+
+($F{TOTAL10}==null?new Double(0):$F{TOTAL10})+
+($F{TOTAL11}==null?new Double(0):$F{TOTAL11})+
+($F{TOTAL12}==null?new Double(0):$F{TOTAL12})
+
+]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="10" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="7" width="870" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="13"/>
+				<textElement markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Total "+ $P{P_GRUPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0000">
+				<reportElement x="101" y="0" width="45" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ANO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement x="774" y="14" width="60" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[new Double($V{V_TOTAL}/$V{V_MEDIA})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="146" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="195" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="243" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="291" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="339" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL5}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="387" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL6}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="435" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL7}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="483" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL8}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="531" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL9}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="579" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL10}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="627" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL11}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="675" y="0" width="48" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL12}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement x="774" y="0" width="60" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{V_TOTAL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="748" y="0" width="25" height="13"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="746" y="14" width="27" height="13"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Média:]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="1" width="870" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

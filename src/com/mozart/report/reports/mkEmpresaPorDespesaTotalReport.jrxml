@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="marketingEmpresaPorDespesaTotalReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="IDE" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Relatório de Produção - Despesa Total"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT HOT.SIGLA, ((1000000+TOT.VALOR)||'@'|| EM.NOME_FANTASIA) NOME_FANTASIA, EM.ANO, MES.MES, MES.VALOR
+FROM
+(SELECT C.ID_HOTEL, E.NOME_FANTASIA, E.ID_EMPRESA, TO_CHAR(MIN(M.DATA_LANCAMENTO),'YYYY') ANO
+FROM EMPRESA_REDE E, CHECKIN C, MOVIMENTO_APARTAMENTO M, TIPO_LANCAMENTO T
+WHERE C.ID_EMPRESA = E.ID_EMPRESA
+AND C.ID_HOTEL IN ($P{IDH})
+AND  C.ID_RESERVA IS NOT NULL
+AND C.ID_CHECKIN = M.ID_CHECKIN
+AND T.ID_HOTEL = C.ID_HOTEL
+AND E.ID_REDE_HOTEL = M.ID_REDE_HOTEL
+AND T.ID_TIPO_LANCAMENTO = M.ID_TIPO_LANCAMENTO
+AND T.ID_IDENTIFICA_LANCAMENTO IN (2,3,5,7,9,11,13,15,22,26,27,28)
+AND M.DATA_LANCAMENTO BETWEEN to_Date($P{P_DATA},'dd/mm/yyyy') AND to_Date($P{P_DATA_FIM},'dd/mm/yyyy')
+GROUP BY C.ID_HOTEL, E.NOME_FANTASIA, E.ID_EMPRESA, TO_CHAR((M.DATA_LANCAMENTO),'YYYY')) EM,
+
+(SELECT C.ID_HOTEL, E.ID_EMPRESA, SUM(M.VALOR_LANCAMENTO) QTD
+FROM EMPRESA_HOTEL E, CHECKIN C, MOVIMENTO_APARTAMENTO M, TIPO_LANCAMENTO T
+WHERE C.ID_EMPRESA = E.ID_EMPRESA
+AND C.ID_HOTEL IN ($P{IDH})
+AND  C.ID_RESERVA IS NOT NULL
+AND C.ID_CHECKIN = M.ID_CHECKIN
+AND E.ID_HOTEL = C.ID_HOTEL
+AND T.ID_HOTEL = C.ID_HOTEL
+AND T.ID_TIPO_LANCAMENTO = M.ID_TIPO_LANCAMENTO
+AND T.ID_IDENTIFICA_LANCAMENTO IN (2,3,5,7,9,11,13,15,22,26,27,28)
+AND M.DATA_LANCAMENTO BETWEEN to_Date($P{P_DATA},'dd/mm/yyyy') AND to_Date($P{P_DATA_FIM},'dd/mm/yyyy')
+GROUP BY C.ID_HOTEL,E.ID_EMPRESA)Q, HOTEL HOT,
+
+(SELECT ID_EMPRESA, MES_ANO.ANO, MES_ANO.MES,
+SUM(DECODE(TO_CHAR(MOVIMENTO_APARTAMENTO.DATA_LANCAMENTO,'MM')+0||'/'||TO_CHAR(MOVIMENTO_APARTAMENTO.DATA_LANCAMENTO,'YYYY'),MES_ANO.MES||'/'||MES_ANO.ANO, VALOR_LANCAMENTO, 0 )) VALOR
+FROM MOVIMENTO_APARTAMENTO, TIPO_LANCAMENTO,  CHECKIN,
+
+							(SELECT A.DIA MES, B.DIA ANO
+							FROM TABLE(CAST(GETMESES AS TYPE_DIA_MES_SET)) A,
+							TABLE(CAST(GETANO(to_Date($P{P_DATA},'dd/mm/yyyy'),to_Date($P{P_DATA_FIM},'dd/mm/yyyy')) AS TYPE_DIA_MES_SET)) B)  MES_ANO
+
+WHERE MOVIMENTO_APARTAMENTO.ID_TIPO_LANCAMENTO = TIPO_LANCAMENTO.ID_TIPO_LANCAMENTO
+AND MOVIMENTO_APARTAMENTO.DATA_LANCAMENTO BETWEEN to_Date($P{P_DATA},'dd/mm/yyyy') AND to_Date($P{P_DATA_FIM},'dd/mm/yyyy')
+AND ID_RESERVA IS NOT NULL
+AND MOVIMENTO_APARTAMENTO.ID_HOTEL=$P{IDH}
+AND CHECKIN.ID_HOTEL=MOVIMENTO_APARTAMENTO.ID_HOTEL
+AND TIPO_LANCAMENTO.ID_HOTEL=MOVIMENTO_APARTAMENTO.ID_HOTEL
+AND TIPO_LANCAMENTO.ID_IDENTIFICA_LANCAMENTO IN (2,3,5,7,9,11,13,15,22,26,27,28)
+AND MOVIMENTO_APARTAMENTO.ID_CHECKIN=CHECKIN.ID_CHECKIN
+GROUP BY ID_EMPRESA,MES_ANO.ANO, MES_ANO.MES) MES,
+
+
+(SELECT ID_EMPRESA,
+SUM(VALOR_LANCAMENTO) VALOR
+FROM MOVIMENTO_APARTAMENTO, TIPO_LANCAMENTO,  CHECKIN
+WHERE MOVIMENTO_APARTAMENTO.ID_TIPO_LANCAMENTO = TIPO_LANCAMENTO.ID_TIPO_LANCAMENTO
+AND MOVIMENTO_APARTAMENTO.DATA_LANCAMENTO BETWEEN to_Date($P{P_DATA},'dd/mm/yyyy') AND to_Date($P{P_DATA_FIM},'dd/mm/yyyy')
+AND ID_RESERVA IS NOT NULL
+AND MOVIMENTO_APARTAMENTO.ID_HOTEL=$P{IDH}
+AND CHECKIN.ID_HOTEL=MOVIMENTO_APARTAMENTO.ID_HOTEL
+AND TIPO_LANCAMENTO.ID_HOTEL=MOVIMENTO_APARTAMENTO.ID_HOTEL
+AND TIPO_LANCAMENTO.ID_IDENTIFICA_LANCAMENTO IN (2,3,5,7,9,11,13,15,22,26,27,28)
+AND MOVIMENTO_APARTAMENTO.ID_CHECKIN=CHECKIN.ID_CHECKIN
+GROUP BY ID_EMPRESA) TOT
+
+WHERE Q.ID_EMPRESA = EM.ID_EMPRESA
+AND HOT.ID_HOTEL = EM.ID_HOTEL
+AND EM.ID_EMPRESA LIKE $P{IDE}
+AND EM.ID_EMPRESA = TOT.ID_EMPRESA
+AND Q.QTD <> 0
+AND EM.ID_EMPRESA = MES.ID_EMPRESA(+)
+ORDER BY HOT.SIGLA, Q.QTD DESC, EM.NOME_FANTASIA, EM.ID_EMPRESA, ANO, MES]]>
+	</queryString>
+	<field name="SIGLA" class="java.lang.String"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="ANO" class="java.lang.String"/>
+	<field name="MES" class="java.math.BigDecimal"/>
+	<field name="VALOR" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="79"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{P_TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="70" splitType="Stretch">
+			<crosstab>
+				<reportElement x="25" y="0" width="548" height="70"/>
+				<rowGroup name="NOME_FANTASIA" width="65" totalPosition="End">
+					<bucket order="Descending">
+						<bucketExpression class="java.lang.String"><![CDATA[$F{NOME_FANTASIA}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="65" height="22"/>
+								<textElement textAlignment="Left">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{NOME_FANTASIA}.substring(
+$V{NOME_FANTASIA}.indexOf("@")+1
+)]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#005FB3" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="11" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="ANO" width="30" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{ANO}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="11"/>
+								<textElement>
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{ANO}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="30" height="11"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="MES" height="11" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.math.BigDecimal"><![CDATA[$F{MES}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="34" height="11"/>
+								<textElement>
+									<font size="7" isBold="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{MES}.intValue()==1?"Jan":
+$V{MES}.intValue()==2?"Fev":
+$V{MES}.intValue()==3?"Mar":
+$V{MES}.intValue()==4?"Abr":
+$V{MES}.intValue()==5?"Mai":
+$V{MES}.intValue()==6?"Jun":
+$V{MES}.intValue()==7?"Jul":
+$V{MES}.intValue()==8?"Ago":
+$V{MES}.intValue()==9?"Set":
+$V{MES}.intValue()==10?"Out":
+$V{MES}.intValue()==11?"Nov":"Dez"]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="37" height="11"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font size="7" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total ]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="VALORMeasure" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{VALOR}]]></measureExpression>
+				</measure>
+				<crosstabCell width="34" height="11">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;-#,##0.00">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="34" height="11"/>
+							<textElement textAlignment="Right">
+								<font size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{VALORMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="34" height="11" rowTotalGroup="NOME_FANTASIA">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;-#,##0.00">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="34" height="11" forecolor="#FFFFFF"/>
+							<textElement textAlignment="Right">
+								<font size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{VALORMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="37" height="11" columnTotalGroup="MES">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;-#,##0.00">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="37" height="11"/>
+							<textElement textAlignment="Right">
+								<font size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{VALORMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="37" height="11" rowTotalGroup="NOME_FANTASIA" columnTotalGroup="MES">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;-#,##0.00">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="37" height="11" forecolor="#FFFFFF"/>
+							<textElement textAlignment="Right">
+								<font size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{VALORMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="34" height="11" rowTotalGroup="ANO">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;-#,##0.00">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="34" height="11"/>
+							<textElement textAlignment="Right">
+								<font size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{VALORMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="37" height="11" rowTotalGroup="ANO" columnTotalGroup="MES">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;-#,##0.00">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="37" height="11"/>
+							<textElement textAlignment="Right">
+								<font size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{VALORMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+	<noData>
+		<band height="40">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="40"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

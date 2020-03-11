@@ -1,0 +1,1113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contabilReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.3636363636363635"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="34"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Relatório Contábil - Contas a Receber"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1 GERAL,
+         ID,
+         TIPO,
+         NVL (VALOR_LIQUIDO, 0) VALOR_LIQUIDO,
+         NVL (IMPOSTOS, 0) IMPOSTOS,
+         BANCOCC,
+         NOME_FANTASIA,
+         DUP,
+         NVL (VALREC, 0) VALREC,
+         NVL (SALDO_ANTERIOR_CONTAS_RECEBER, 0) SALDO_ANTERIOR_CONTAS_RECEBER,
+         NVL (VALOR_LIQUIDO_TOTAL, 0) VALOR_LIQUIDO_TOTAL,
+         NVL (VALOR_DUPLICATA_CALCULADO, 0) VALOR_DUPLICATA_CALCULADO,
+         NVL (JUROS_RECEBIMENTO, 0) JUROS_RECEBIMENTO,
+         NVL (DESCONTO_RECEBIMENTO, 0) DESCONTO_RECEBIMENTO,
+         NUM_CONTA_CORRENTE,
+         ID_BANCO,
+         NVL (TOTAL_MES, 0) TOTAL_MES,
+         NVL (JUROS_MES, 0) JUROS_MES,
+         NVL (DESCONTO_MES, 0) DESCONTO_MES,
+         NVL (IMPOSTOS_MES, 0) IMPOSTOS_MES,
+         NVL (TOTAL_LIQUIDO_MES, 0) TOTAL_LIQUIDO_MES,
+         FAT.*
+    FROM (SELECT *
+            FROM (SELECT 1 ID,
+                         $P{IDH} id_hotel,
+                         TOTAL_MES.TOTAL TOTAL_MES,
+                         TOTAL_MES.JUROS JUROS_MES,
+                         TOTAL_MES.DESCONTO DESCONTO_MES,
+                         TOTAL_MES.IMPOSTOS IMPOSTOS_MES,
+                           TOTAL_MES.TOTAL
+                         - TOTAL_MES.JUROS
+                         + TOTAL_MES.DESCONTO
+                         + TOTAL_MES.IMPOSTOS
+                            TOTAL_LIQUIDO_MES
+                    FROM (SELECT SUM (NVL (VALOR_RECEBIDO, 0)) TOTAL,
+                                 SUM (NVL (JUROS_RECEBIMENTO, 0)) JUROS,
+                                 SUM (NVL (DESCONTO_RECEBIMENTO, 0)) DESCONTO,
+                                 SUM (
+                                      NVL (ISS, 0)
+                                    + NVL (COFINS, 0)
+                                    + NVL (PIS, 0)
+                                    + NVL (IR_RETENCAO, 0)
+                                    + NVL (CSSL, 0))
+                                    IMPOSTOS
+                            FROM DUPLICATA
+                           WHERE TRUNC (DATA_RECEBIMENTO) BETWEEN TRUNC (
+                                                                     TO_DATE (
+                                                                        $P{P_DATA},
+                                                                        'dd/mm/yyyy'),
+                                                                     'MONTH')
+                                                              AND TO_DATE (
+                                                                     $P{P_DATA},
+                                                                     'dd/mm/yyyy')
+                                 AND ID_HOTEL = $P{IDH}) TOTAL_MES) TOTAL_MES,
+                 (SELECT du.id_hotel,
+       DECODE (
+          DATA_DESCONTO,
+          NULL, 'RECEBIDAS',
+          DECODE (DATA_RECOMPRA,
+                  NULL, 'DESCONTADAS E RECEBIDAS',
+                  'RECEBIDAS'))
+          AS TIPO,
+       (  NVL (DU.VALOR_DUPLICATA, 0)
+        - NVL (DU.COMISSAO, 0)
+        - NVL (DU.AJUSTES, 0)
+        + NVL (DU.IR, 0)
+        - NVL (DU.ENCARGOS, 0))
+          VALOR_LIQUIDO,
+       (  NVL (DU.ISS, 0)
+        + NVL (DU.COFINS, 0)
+        + NVL (DU.PIS, 0)
+        + NVL (DU.IR_RETENCAO, 0)
+        + NVL (DU.CSSL, 0))
+          IMPOSTOS,
+       (BA.NOME_FANTASIA || '-' || CC.NUM_CONTA_CORRENTE) AS BANCOCC,
+       ER.NOME_FANTASIA,
+       DU.NUM_DUPLICATA || '-' || DU.NUM_PARCELAS || '-' || DU.ANO AS DUP,
+         NVL (DU.VALOR_DUPLICATA, 0)
+       - NVL (DU.COMISSAO, 0)
+       - NVL (DU.AJUSTES, 0)
+       + NVL (DU.IR, 0)
+       - NVL (DU.ENCARGOS, 0)
+       - NVL (DU.ISS, 0)
+       - NVL (DU.COFINS, 0)
+       - NVL (DU.PIS, 0)
+       - NVL (DU.IR_RETENCAO, 0)
+       - NVL (DU.CSSL, 0)
+       + NVL (DU.JUROS_RECEBIMENTO, 0)
+       - NVL (DU.DESCONTO_RECEBIMENTO, 0)
+          AS VALREC,
+       VALOR_LIQUIDO_TOTAL,
+         NVL (DU.VALOR_DUPLICATA, 0)
+       - NVL (DU.COMISSAO, 0)
+       - NVL (DU.AJUSTES, 0)
+       + NVL (DU.IR, 0)
+       - NVL (DU.ENCARGOS, 0)
+          VALOR_DUPLICATA_CALCULADO,
+       DU.JUROS_RECEBIMENTO,
+       DU.DESCONTO_RECEBIMENTO,
+       CC.NUM_CONTA_CORRENTE,
+       CC.ID_BANCO
+  FROM (SELECT SUM (
+                    (NVL (DU.VALOR_DUPLICATA, 0))
+                  - (NVL (DU.ENCARGOS, 0))
+                  - (NVL (DU.COMISSAO, 0))
+                  + (NVL (DU.IR, 0))
+                  - (NVL (DU.AJUSTES, 0)))
+                  AS VALOR_LIQUIDO_TOTAL
+          FROM DUPLICATA DU,
+               STATUS_NOTA SN,
+               EMPRESA_REDE ER,
+               (SELECT C.NUM_CONTA_CORRENTE,C.ID_CONTA_CORRENTE, C.ID_BANCO, C.ID_HOTEL
+                  FROM    CONTA_CORRENTE C
+                       JOIN
+                          PLANO_CONTAS P
+                       ON (C.ID_HOTEL = P.ID_HOTEL_MUTUO(+))
+                 WHERE C.ID_HOTEL = $P{IDH}) CC,
+               BANCO BA
+         WHERE     DU.ID_HOTEL = $P{IDH}
+               AND DU.ID_EMPRESA = ER.ID_EMPRESA
+               AND ER.ID_REDE_HOTEL = DU.ID_REDE_HOTEL
+               AND DU.SITUACAO = 'R'
+               AND DU.ID_CONTA_CORRENTE = CC.ID_CONTA_CORRENTE
+               AND DU.ID_NOTA = SN.ID_NOTA
+               AND DU.ID_HOTEL = $P{IDH}
+               AND SN.ID_HOTEL = DU.ID_HOTEL
+               AND CC.ID_HOTEL = DU.ID_HOTEL
+               AND CC.ID_BANCO = BA.ID_BANCO
+               AND TRUNC (DU.DATA_RECEBIMENTO) =
+                      TO_DATE ($P{P_DATA}, 'dd/mm/yyyy')),
+       DUPLICATA DU,
+       STATUS_NOTA SN,
+       EMPRESA_REDE ER,
+       (SELECT C.NUM_CONTA_CORRENTE,C.ID_CONTA_CORRENTE, C.ID_BANCO, C.ID_HOTEL
+          FROM    CONTA_CORRENTE C
+               JOIN
+                  PLANO_CONTAS P
+               ON (C.ID_HOTEL = P.ID_HOTEL_MUTUO(+))
+         WHERE C.ID_HOTEL = $P{IDH}) CC,
+       BANCO BA
+ WHERE     DU.ID_HOTEL = $P{IDH}
+       AND SN.ID_HOTEL = DU.ID_HOTEL
+       AND CC.ID_HOTEL = DU.ID_HOTEL
+       AND ER.ID_REDE_HOTEL = DU.ID_REDE_HOTEL
+       AND DU.ID_EMPRESA = ER.ID_EMPRESA
+       AND DU.SITUACAO = 'R'
+       AND DU.ID_CONTA_CORRENTE = CC.ID_CONTA_CORRENTE
+       AND DU.ID_NOTA = SN.ID_NOTA
+       AND CC.ID_BANCO = BA.ID_BANCO
+       AND TRUNC (DU.DATA_RECEBIMENTO) = TO_DATE ($P{P_DATA}, 'dd/mm/yyyy')
+) tb
+           WHERE total_mes.id_hotel = tb.id_hotel(+)
+          UNION ALL
+          SELECT *
+            FROM (SELECT 2 ID,
+                         $P{IDH} id_hotel,
+                         TOTAL_MES.TOTAL TOTAL_MES,
+                         TOTAL_MES.JUROS JUROS_MES,
+                         TOTAL_MES.DESCONTO DESCONTO_MES,
+                         TOTAL_MES.IMPOSTOS IMPOSTOS_MES,
+                           TOTAL_MES.TOTAL
+                         - TOTAL_MES.JUROS
+                         + TOTAL_MES.DESCONTO
+                         + TOTAL_MES.IMPOSTOS
+                            TOTAL_LIQUIDO_MES
+                    FROM (SELECT SUM (NVL (VALOR_RECEBIDO, 0)) TOTAL,
+                                 SUM (NVL (JUROS_RECEBIMENTO, 0)) JUROS,
+                                 SUM (NVL (DESCONTO_RECEBIMENTO, 0)) DESCONTO,
+                                 SUM (
+                                      NVL (ISS, 0)
+                                    + NVL (COFINS, 0)
+                                    + NVL (PIS, 0)
+                                    + NVL (IR_RETENCAO, 0)
+                                    + NVL (CSSL, 0))
+                                    IMPOSTOS
+                            FROM DUPLICATA
+                           WHERE TRUNC (DATA_DESCONTO) BETWEEN TRUNC (
+                                                                  TO_DATE (
+                                                                     $P{P_DATA},
+                                                                     'dd/mm/yyyy'),
+                                                                  'MONTH')
+                                                           AND TO_DATE (
+                                                                  $P{P_DATA},
+                                                                  'dd/mm/yyyy')
+                                 AND ID_HOTEL = $P{IDH}) TOTAL_MES) TOTAL_MES,
+                 (SELECT id_hotel,
+                         TIPO,
+                         VALOR_LIQUIDO,
+                         VALOR_IMPOSTO,
+                         BANCOCC,
+                         EMPRESA,
+                         DUP,
+                         VALOR_RECEBIDO,
+                         NULL VALOR_LIQUIDO_TOTAL,
+                         VALOR_DUPLICATA_CALCULADO,
+                         JUROS_RECEBIMENTO,
+                         DESCONTO_RECEBIMENTO,
+                         NUM_CONTA_CORRENTE,
+                         ID_BANCO
+                    FROM (SELECT 'Descontada' TIPO,
+                                 dup.id_hotel,
+                                 (dup.id_duplicata),
+                                    dup.num_duplicata
+                                 || '-'
+                                 || dup.num_parcelas
+                                 || '-'
+                                 || dup.ano
+                                    AS dup,
+                                 dup.id_duplicata_descontada,
+                                 TRUNC (dup.data_recebimento),
+                                 TRUNC (dup.data_recompra),
+                                 NVL (dup.valor_recebido, 0) valor_recebido,
+                                 NVL (dup.desp_financeira, 0) valor_imposto,
+                                 NVL (dup.juros_recebimento, 0) valor_juros,
+                                 NVL (dup.ajustes, 0) valor_desconto,
+                                 emp.nome_fantasia empresa,
+                                 dup.valor_duplicata,
+                                   DUP.VALOR_DUPLICATA
+                                 - NVL (DUP.ENCARGOS, 0)
+                                 - NVL (DUP.COMISSAO, 0)
+                                 + NVL (DUP.IR, 0)
+                                 - NVL (DUP.AJUSTES, 0)
+                                 - NVL (DUP.PIS, 0)
+                                 - NVL (DUP.COFINS, 0)
+                                 - NVL (DUP.ISS, 0)
+                                 - NVL (DUP.IR_RETENCAO, 0)
+                                 - NVL (DUP.CSSL, 0)
+                                    AS VALOR_LIQUIDO,
+                                   NVL (DUP.VALOR_DUPLICATA, 0)
+                                 - NVL (DUP.COMISSAO, 0)
+                                 - NVL (DUP.AJUSTES, 0)
+                                 + NVL (DUP.IR, 0)
+                                 - NVL (DUP.ENCARGOS, 0)
+                                    VALOR_DUPLICATA_CALCULADO,
+                                 TRUNC (dup.data_vencimento),
+                                 TRUNC (dup.data_desconto),
+                                 (   BAN.NOME_FANTASIA
+                                  || '-'
+                                  || CCO.NUM_CONTA_CORRENTE)
+                                    AS BANCOCC,
+                                 DUP.JUROS_RECEBIMENTO,
+                                 DUP.DESCONTO_RECEBIMENTO,
+                                 CCO.NUM_CONTA_CORRENTE,
+                                 CCO.ID_BANCO
+                            FROM duplicata dup
+                                 JOIN duplicata_descontada dud
+                                    ON (dup.ID_DUPLICATA_DESCONTADA =
+                                           dud.ID_DUPLICATA_DESCONTADA)
+                                 JOIN empresa_rede emp
+                                    ON (dup.id_empresa = emp.id_empresa
+                                        AND emp.id_rede_hotel = $P{IDRH})
+                                 JOIN conta_corrente cco
+                                    ON (cco.ID_conta_corrente = dup.ID_conta_corrente
+                                        AND cco.id_hotel = dup.id_hotel)
+                                 JOIN banco ban
+                                    ON (ban.id_banco = cco.id_banco)
+                           WHERE TRUNC (dup.data_desconto) =
+                                    TO_DATE ($P{P_DATA}, 'dd/mm/yyyy')
+                                 AND dud.id_hotel = $P{IDH})) tb
+           WHERE total_mes.id_hotel = tb.id_hotel(+)
+          UNION ALL
+          SELECT *
+            FROM (SELECT 3 ID,
+                         $P{IDH} id_hotel,
+                         TOTAL_MES.TOTAL TOTAL_MES,
+                         TOTAL_MES.JUROS JUROS_MES,
+                         TOTAL_MES.DESCONTO DESCONTO_MES,
+                         TOTAL_MES.IMPOSTOS IMPOSTOS_MES,
+                           TOTAL_MES.TOTAL
+                         - TOTAL_MES.JUROS
+                         + TOTAL_MES.DESCONTO
+                         + TOTAL_MES.IMPOSTOS
+                            TOTAL_LIQUIDO_MES
+                    FROM (SELECT SUM (NVL (VALOR_RECEBIDO, 0)) TOTAL,
+                                 SUM (NVL (JUROS_RECEBIMENTO, 0)) JUROS,
+                                 SUM (NVL (DESCONTO_RECEBIMENTO, 0)) DESCONTO,
+                                 SUM (
+                                      NVL (ISS, 0)
+                                    + NVL (COFINS, 0)
+                                    + NVL (PIS, 0)
+                                    + NVL (IR_RETENCAO, 0)
+                                    + NVL (CSSL, 0))
+                                    IMPOSTOS
+                            FROM DUPLICATA
+                           WHERE TRUNC (DATA_RECOMPRA) BETWEEN TRUNC (
+                                                                  TO_DATE (
+                                                                     $P{P_DATA},
+                                                                     'dd/mm/yyyy'),
+                                                                  'MONTH')
+                                                           AND TO_DATE (
+                                                                  $P{P_DATA},
+                                                                  'dd/mm/yyyy')
+                                 AND ID_HOTEL = $P{IDH}) TOTAL_MES) TOTAL_MES,
+                 (SELECT id_hotel,
+                         TIPO,
+                         VALOR_LIQUIDO,
+                         VALOR_IMPOSTO,
+                         BANCOCC,
+                         EMPRESA,
+                         DUP,
+                         VALOR_RECEBIDO,
+                         NULL VALOR_LIQUIDO_TOTAL,
+                         VALOR_DUPLICATA_CALCULADO,
+                         JUROS_RECEBIMENTO,
+                         DESCONTO_RECEBIMENTO,
+                         NUM_CONTA_CORRENTE,
+                         ID_BANCO
+                    FROM (SELECT 'Recompradas' TIPO,
+                                 dup.id_hotel,
+                                 (dup.id_duplicata),
+                                    dup.num_duplicata
+                                 || '-'
+                                 || dup.num_parcelas
+                                 || '-'
+                                 || dup.ano
+                                    AS dup,
+                                 dup.id_duplicata_descontada,
+                                 TRUNC (dup.data_recebimento),
+                                 TRUNC (dup.data_recompra),
+                                 NVL (dup.valor_recebido, 0) valor_recebido,
+                                 NVL (dup.desp_financeira, 0) valor_imposto,
+                                 NVL (dup.juros_recebimento, 0) valor_juros,
+                                 NVL (dup.ajustes, 0) valor_desconto,
+                                 emp.nome_fantasia empresa,
+                                 dup.valor_duplicata,
+                                   DUP.VALOR_DUPLICATA
+                                 - NVL (DUP.ENCARGOS, 0)
+                                 - NVL (DUP.COMISSAO, 0)
+                                 + NVL (DUP.IR, 0)
+                                 - NVL (DUP.AJUSTES, 0)
+                                 - NVL (DUP.PIS, 0)
+                                 - NVL (DUP.COFINS, 0)
+                                 - NVL (DUP.ISS, 0)
+                                 - NVL (DUP.IR_RETENCAO, 0)
+                                 - NVL (DUP.CSSL, 0)
+                                    AS VALOR_LIQUIDO,
+                                   NVL (DUP.VALOR_DUPLICATA, 0)
+                                 - NVL (DUP.COMISSAO, 0)
+                                 - NVL (DUP.AJUSTES, 0)
+                                 + NVL (DUP.IR, 0)
+                                 - NVL (DUP.ENCARGOS, 0)
+                                    VALOR_DUPLICATA_CALCULADO,
+                                 TRUNC (dup.data_vencimento),
+                                 TRUNC (dup.data_desconto),
+                                 (   BAN.NOME_FANTASIA
+                                  || '-'
+                                  || CCO.NUM_CONTA_CORRENTE)
+                                    AS BANCOCC,
+                                 DUP.JUROS_RECEBIMENTO,
+                                 DUP.DESCONTO_RECEBIMENTO,
+                                 CCO.NUM_CONTA_CORRENTE,
+                                 CCO.ID_BANCO
+                            FROM duplicata dup
+                                 JOIN empresa_rede emp
+                                    ON (dup.id_empresa = emp.id_empresa
+                                        AND emp.id_rede_hotel = $P{IDRH})
+                                 JOIN conta_corrente cco
+                                    ON (cco.ID_conta_corrente = dup.ID_conta_corrente
+                                        AND cco.id_hotel = dup.id_hotel)
+                                 JOIN banco ban
+                                    ON (ban.id_banco = cco.id_banco)
+                           WHERE TRUNC (dup.data_recompra) =
+                                    TO_DATE ($P{P_DATA}, 'dd/mm/yyyy')
+                                 AND dup.id_hotel = $P{IDH})) tb
+           WHERE total_mes.id_hotel = tb.id_hotel(+)),
+                    (SELECT NVL (SALDODIA, 0) FAT_DIA, NVL (SALDOMES, 0) FAT_MES
+            FROM (SELECT (SUM (
+                               (NVL (DU.VALOR_DUPLICATA, 0))
+                             - (NVL (DU.ENCARGOS, 0))
+                             - (NVL (DU.COMISSAO, 0))
+                             + (NVL (DU.IR, 0))
+                             - (NVL (DU.AJUSTES, 0))))
+                            AS SALDODIA
+                    FROM DUPLICATA DU, CONTROLA_DATA CD
+                   WHERE DU.ID_HOTEL = $P{IDH} AND DU.ID_HOTEL = CD.ID_HOTEL
+                         AND TRUNC (du.DATA_LANCAMENTO) =
+                                TO_DATE ($P{P_DATA}, 'dd/mm/yyyy')) FAT_DIA,
+                 (SELECT (SUM (
+                               (NVL (DU.VALOR_DUPLICATA, 0))
+                             - (NVL (DU.ENCARGOS, 0))
+                             - (NVL (DU.COMISSAO, 0))
+                             + (NVL (DU.IR, 0))
+                             - (NVL (DU.AJUSTES, 0))))
+                            AS SALDOMES
+                    FROM DUPLICATA DU, CONTROLA_DATA CD
+                   WHERE DU.ID_HOTEL = $P{IDH} AND DU.ID_HOTEL = CD.ID_HOTEL
+                         AND TRUNC (du.DATA_LANCAMENTO) BETWEEN TRUNC (
+                                                                   TO_DATE (
+                                                                      $P{P_DATA},
+                                                                      'dd/mm/yyyy'),
+                                                                   'MONTH')
+                                                            AND TO_DATE (
+                                                                   $P{P_DATA},
+                                                                   'dd/mm/yyyy')) FAT_MES) FAT,
+         (SELECT SALDO_ANTERIOR_CONTAS_RECEBER
+            FROM SALDOS_DUPLICATA SD
+           WHERE SD.ANO =
+                    TO_CHAR (ADD_MONTHS (TO_DATE ($P{P_DATA}, 'dd/mm/yyyy'), -1),
+                             'YYYY')
+                 AND SD.MES =
+                        TO_CHAR (
+                           ADD_MONTHS (TO_DATE ($P{P_DATA}, 'dd/mm/yyyy'), -1),
+                           'MM')
+                 AND SD.ID_HOTEL = $P{IDH})
+ORDER BY ID,
+         TIPO,
+         BANCOCC,
+         NOME_FANTASIA]]>
+	</queryString>
+	<field name="GERAL" class="java.math.BigDecimal"/>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="TIPO" class="java.lang.String"/>
+	<field name="VALOR_LIQUIDO" class="java.math.BigDecimal"/>
+	<field name="IMPOSTOS" class="java.math.BigDecimal"/>
+	<field name="BANCOCC" class="java.lang.String"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="DUP" class="java.lang.String"/>
+	<field name="VALREC" class="java.math.BigDecimal"/>
+	<field name="SALDO_ANTERIOR_CONTAS_RECEBER" class="java.math.BigDecimal"/>
+	<field name="VALOR_LIQUIDO_TOTAL" class="java.math.BigDecimal"/>
+	<field name="VALOR_DUPLICATA_CALCULADO" class="java.math.BigDecimal"/>
+	<field name="JUROS_RECEBIMENTO" class="java.math.BigDecimal"/>
+	<field name="DESCONTO_RECEBIMENTO" class="java.math.BigDecimal"/>
+	<field name="NUM_CONTA_CORRENTE" class="java.math.BigDecimal"/>
+	<field name="ID_BANCO" class="java.math.BigDecimal"/>
+	<field name="TOTAL_MES" class="java.math.BigDecimal"/>
+	<field name="JUROS_MES" class="java.math.BigDecimal"/>
+	<field name="DESCONTO_MES" class="java.math.BigDecimal"/>
+	<field name="IMPOSTOS_MES" class="java.math.BigDecimal"/>
+	<field name="TOTAL_LIQUIDO_MES" class="java.math.BigDecimal"/>
+	<field name="FAT_DIA" class="java.math.BigDecimal"/>
+	<field name="FAT_MES" class="java.math.BigDecimal"/>
+	<variable name="TOTAL_VR_RECEBIDO" class="java.lang.Double" resetType="Group" resetGroup="GROUP_CC" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALREC}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_VR_LIQUIDO" class="java.lang.Double" resetType="Group" resetGroup="GROUP_CC" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALOR_DUPLICATA_CALCULADO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_MES_DUPLICATAS" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_MES}+$F{SALDO_ANTERIOR_CONTAS_RECEBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_IMPOSTO" class="java.lang.Double" resetType="Group" resetGroup="GROUP_CC" calculation="Sum">
+		<variableExpression><![CDATA[$F{IMPOSTOS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_JUROS" class="java.lang.Double" resetType="Group" resetGroup="GROUP_CC" calculation="Sum">
+		<variableExpression><![CDATA[$F{JUROS_RECEBIMENTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DESCONTO" class="java.lang.Double" resetType="Group" resetGroup="GROUP_CC" calculation="Sum">
+		<variableExpression><![CDATA[$F{DESCONTO_RECEBIMENTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_VR_RECEBIDO_BANCO" class="java.lang.Double" resetType="Group" resetGroup="Banco_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALREC}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_IMPOSTO_BANCO" class="java.lang.Double" resetType="Group" resetGroup="Banco_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{IMPOSTOS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_JUROS_BANCO" class="java.lang.Double" resetType="Group" resetGroup="Banco_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{JUROS_RECEBIMENTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DESCONTO_BANCO" class="java.lang.Double" resetType="Group" resetGroup="Banco_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{DESCONTO_RECEBIMENTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_VR_LIQUIDO_BANCO" class="java.lang.Double" resetType="Group" resetGroup="Banco_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALOR_DUPLICATA_CALCULADO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_VR_RECEBIDO_ID" class="java.lang.Double" resetType="Group" resetGroup="id_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALREC}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_IMPOSTO_ID" class="java.lang.Double" resetType="Group" resetGroup="id_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{IMPOSTOS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_JUROS_ID" class="java.lang.Double" resetType="Group" resetGroup="id_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{JUROS_RECEBIMENTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DESCONTO_ID" class="java.lang.Double" resetType="Group" resetGroup="id_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{DESCONTO_RECEBIMENTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_VR_LIQUIDO_ID" class="java.lang.Double" resetType="Group" resetGroup="id_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALOR_DUPLICATA_CALCULADO}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_LIQUIDO_MES_GERAL" class="java.lang.Double" resetType="Group" resetGroup="grupo_geral" incrementType="Group" incrementGroup="id_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_LIQUIDO_MES}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="grupo_geral">
+		<groupExpression><![CDATA[$F{GERAL}]]></groupExpression>
+		<groupFooter>
+			<band height="14"/>
+		</groupFooter>
+	</group>
+	<group name="id_Group">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement x="1" y="16" width="92" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Duplicata"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="95" y="16" width="108" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Empresa"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="29" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.75"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement x="465" y="16" width="50" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Líquido"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="423" y="16" width="40" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Desc."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="371" y="16" width="50" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Juros"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="315" y="16" width="53" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Impostos"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="259" y="16" width="53" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Recebido"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="204" y="16" width="55" height="13">
+						<printWhenExpression><![CDATA[new Boolean ($F{ID}.intValue()==1)]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Data Pgto"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="2" width="258" height="13"/>
+					<textElement markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ID}.intValue()==1?"DUPLICATAS RECEBIDAS":$F{ID}.intValue()==2?"DUPLICATAS DESCONTADAS":$F{ID}.intValue()==3?"DUPLICATAS RECOMPRADAS":""]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="60">
+				<line>
+					<reportElement x="0" y="29" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+				<textField isBlankWhenNull="true">
+					<reportElement x="2" y="1" width="218" height="13"/>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ID}.intValue()==1?"Saldo do Dia das Duplicatas Recebidas:":$F{ID}.intValue()==2?"Saldo do Dia das Duplicatas Descontadas:":$F{ID}.intValue()==3?"Saldo do Dia das Duplicatas Recompradas:":""]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="259" y="1" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_VR_RECEBIDO_ID}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="371" y="1" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_JUROS_ID}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="423" y="1" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DESCONTO_ID}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="465" y="1" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_VR_LIQUIDO_ID}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="315" y="1" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_IMPOSTO_ID}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="2" y="15" width="239" height="13"/>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ID}.intValue()==1?"Sub Total do Mês das Duplicatas Recebidas:":$F{ID}.intValue()==2?"Sub Total do Mês das Duplicatas Descontadas:":$F{ID}.intValue()==3?"Sub Total do Mês das Duplicatas Recompradas:":""]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="371" y="15" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{JUROS_MES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="259" y="15" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_MES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="465" y="15" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_LIQUIDO_MES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="423" y="15" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DESCONTO_MES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="315" y="15" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{IMPOSTOS_MES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="517" y="15" width="55" height="13" forecolor="#FF0000"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTAL_LIQUIDO_MES}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="32" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+				<textField isBlankWhenNull="true">
+					<reportElement x="1" y="34" width="258" height="13">
+						<printWhenExpression><![CDATA[$F{ID}.intValue()==1]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ID}.intValue()==1?"Saldo Do Mês Das Duplicatas a Receber:":$F{ID}.intValue()==2?"Saldo do Mês das Duplicatas Descontadas:":$F{ID}.intValue()==3?"Saldo do Mês das Duplicatas Recompradas:":""]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="508" y="34" width="64" height="13" forecolor="#0000FF">
+						<printWhenExpression><![CDATA[$F{ID}.intValue()==1]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SALDO_ANTERIOR_CONTAS_RECEBER}.doubleValue()+$F{FAT_MES}.doubleValue()-$F{TOTAL_LIQUIDO_MES}.doubleValue()]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="48" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="0" y="51" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Banco_group">
+		<groupExpression><![CDATA[$F{ID_BANCO}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField isBlankWhenNull="true">
+					<reportElement x="72" y="1" width="92" height="13"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{BANCOCC}.substring(0,$F{BANCOCC}.indexOf("-"))]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="259" y="1" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_VR_RECEBIDO_BANCO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="315" y="1" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_IMPOSTO_BANCO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="371" y="1" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_JUROS_BANCO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="423" y="1" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DESCONTO_BANCO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="465" y="1" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_VR_LIQUIDO_BANCO}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="1" y="1" width="70" height="13"/>
+					<textElement textAlignment="Left">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total do Banco:]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="14" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.75"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="GROUP_CC">
+		<groupExpression><![CDATA[$F{NUM_CONTA_CORRENTE}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="14">
+				<staticText>
+					<reportElement x="1" y="0" width="70" height="13"/>
+					<textElement textAlignment="Left">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total da Conta:]]></text>
+				</staticText>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="259" y="1" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_VR_RECEBIDO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="465" y="0" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_VR_LIQUIDO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="315" y="1" width="53" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_IMPOSTO}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="370" y="0" width="50" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_JUROS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="423" y="1" width="40" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_DESCONTO}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="72" y="1" width="131" height="12"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{NUM_CONTA_CORRENTE}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="13" width="573" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.25" lineStyle="Dotted"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="79"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{P_TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$P{P_DATA}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="87" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="36" width="92" height="13"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SALDO ANTERIOR]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="51" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="1" y="58" width="92" height="13"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[FATURAMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="349" y="14" width="92" height="13"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Total dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="462" y="14" width="110" height="13"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Acumulado do mês]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="74" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="462" y="35" width="110" height="13" forecolor="#0000FF"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALDO_ANTERIOR_CONTAS_RECEBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="27" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="349" y="58" width="92" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FAT_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="462" y="58" width="111" height="13" forecolor="#0000FF"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FAT_MES}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="53" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="77" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="32" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="1" width="92" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DUP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="1" width="108" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="259" y="1" width="53" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALREC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="315" y="1" width="53" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IMPOSTOS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="465" y="1" width="50" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALOR_DUPLICATA_CALCULADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement x="371" y="1" width="50" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JUROS_RECEBIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="423" y="1" width="40" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCONTO_RECEBIMENTO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="1" width="573" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="525" y="4" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="507" y="4" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="471" y="4" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="543" y="4" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="50">
+			<subreport>
+				<reportElement x="0" y="0" width="574" height="50"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

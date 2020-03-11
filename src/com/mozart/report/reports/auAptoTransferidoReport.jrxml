@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AptoTransferidosReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="DEFAULT" isDefault="true" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Apartamento Transferido"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT INITCAP(APARTAMENTO_TRANSFERIDO.MOTIVO) MOTIVO, APARTAMENTO_TRANSFERIDO.DATA, APARTAMENTO_TRANSFERIDO.HORA,
+APARTAMENTO.NUM_APARTAMENTO DESTINO, APARTAMENTO_ORIGEM.NUM_APARTAMENTO ORIGEM,
+INITCAP(RTRIM(MIN(HOSPEDE.SOBRENOME_HOSPEDE))) || '/' || INITCAP(RTRIM(MIN(HOSPEDE.NOME_HOSPEDE))) HOSPEDE,
+INITCAP(SUBSTR(USUARIO.NICK, 8 , LENGTH(USUARIO.NICK))) NICK, CONTROLA_DATA.FRONT_OFFICE, to_Char(CONTROLA_DATA.FRONT_OFFICE, 'dd/mm/YYYY')FRONT_OFFICE_STR, INITCAP(TIPO_TRANSFERENCIA)TIPO_TRANSFERENCIA,
+NVL(APARTAMENTO_TRANSFERIDO.VALOR_LANCAMENTO,0)VALOR_LANCAMENTO
+FROM APARTAMENTO_TRANSFERIDO, APARTAMENTO, ROOM_LIST, LOG_USUARIO, USUARIO, CONTROLA_DATA, HOSPEDE,
+(SELECT id_apartamento, num_apartamento
+FROM APARTAMENTO
+WHERE APARTAMENTO.ID_HOTEL = $P{IDH}) APARTAMENTO_ORIGEM
+WHERE trunc(APARTAMENTO_TRANSFERIDO.DATA) = to_Date( $P{P_DATA},'dd/mm/yyyy')
+AND APARTAMENTO_ORIGEM.ID_APARTAMENTO = APARTAMENTO_TRANSFERIDO.ID_APARTAMENTO_ORIGEM
+AND APARTAMENTO_TRANSFERIDO.ID_APARTAMENTO_DESTINO = APARTAMENTO.ID_APARTAMENTO
+AND APARTAMENTO_TRANSFERIDO.ID_CHECKIN = ROOM_LIST.ID_CHECKIN
+AND APARTAMENTO_TRANSFERIDO.ID_HOTEL = $P{IDH}
+AND APARTAMENTO_TRANSFERIDO.ID_APARTAMENTO_TRANSFERIDO = LOG_USUARIO.ID_AUDITADO
+AND LOG_USUARIO.ID_USUARIO = USUARIO.ID_USUARIO
+AND CONTROLA_DATA.ID_HOTEL = APARTAMENTO.ID_HOTEL
+AND ROOM_LIST.ID_HOSPEDE = HOSPEDE.ID_HOSPEDE
+AND LOG_USUARIO.OPERACAO='Inclusão'
+GROUP BY APARTAMENTO_TRANSFERIDO.MOTIVO, APARTAMENTO_TRANSFERIDO.DATA,
+APARTAMENTO_TRANSFERIDO.HORA, APARTAMENTO.NUM_APARTAMENTO,
+APARTAMENTO_ORIGEM.NUM_APARTAMENTO, HOSPEDE.SOBRENOME_HOSPEDE,
+HOSPEDE.NOME_HOSPEDE, USUARIO.NICK, CONTROLA_DATA.FRONT_OFFICE,
+TIPO_TRANSFERENCIA, APARTAMENTO_TRANSFERIDO.VALOR_LANCAMENTO
+ORDER BY APARTAMENTO_TRANSFERIDO.DATA]]>
+	</queryString>
+	<field name="MOTIVO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HORA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DESTINO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ORIGEM" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HOSPEDE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NICK" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE_STR" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TIPO_TRANSFERENCIA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VALOR_LANCAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="75" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="572" height="75"/>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$F{FRONT_OFFICE_STR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="13" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="12" width="573" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="1" width="60" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apto Origem]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="1" width="86" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome do Hóspede]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="1" width="96" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Motivo Transferência]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="323" y="1" width="40" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="369" y="1" width="40" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="1" width="50" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="66" y="1" width="52" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Apto Atual]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="474" y="1" width="40" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hora]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="518" y="1" width="50" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usuário]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="1" width="60" height="12"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{ORIGEM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="66" y="1" width="52" height="12"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{DESTINO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="125" y="1" width="86" height="12"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="1" width="96" height="12"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{MOTIVO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="323" y="1" width="40" height="12"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{VALOR_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="369" y="1" width="40" height="12"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TIPO_TRANSFERENCIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="422" y="1" width="50" height="12"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DATA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH.mm">
+				<reportElement x="474" y="1" width="40" height="12"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{HORA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="518" y="1" width="50" height="12"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{NICK}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<staticText>
+				<reportElement x="479" y="2" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="533" y="2" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="515" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="552" y="2" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="573" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="0" y="0" width="573" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

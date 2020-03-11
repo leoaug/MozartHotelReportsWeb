@@ -1,0 +1,1446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fnrhReport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5000000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="P_CHECKIN" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_RESERVA" class="java.lang.String"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA1" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_DATA2" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT RL.ID_ROOM_LIST, C.ID_HOTEL, C.ID_CHECKIN, H.NOME_FANTASIA, H.RAZAO_SOCIAL, H.ENDERECO ||', '||(TO_CHAR(REPLACE (H.NUMERO||', '|| H.COMPLEMENTO||' - ' || H.BAIRRO||' - '||H.CEP,' '))) ENDERECO, H.CEP, H.TELEFONE, PROF.PROFISSAO, CID.NACIONALIDADE,
+(HOSP.NOME_HOSPEDE) || ' ' || (HOSP.SOBRENOME_HOSPEDE) NOME, DECODE(HOSP.SEXO,'M','S') SEXO_M,DECODE(HOSP.SEXO,'F','S') SEXO_F,
+HOSP.IDENTIDADE, HOSP.ORGAO_EXPEDIDOR, HOSP.CPF,
+HOSP.ENDERECO ||','|| TO_CHAR(REPLACE(HOSP.NUMERO||','||HOSP.COMPLEMENTO||' - '||HOSP.BAIRRO||' - '||HOSP.CEP,' ')) RESIDENCIA_PERMANENTE,
+CID.CIDADE CIDADE_HOSPEDE,
+CID.ESTADO ESTADO_HOSPEDE, CID.PAIS PAIS_HOSPEDE, C.MOTIVO_VIAGEM, C.MEIO_TRANSPORTE,
+TO_CHAR(NVL(RL.DATA_ENTRADA,C.DATA_ENTRADA),'DD/MM/YYYY') DATA_ENTRADA,
+TO_CHAR(NVL(RL.DATA_ENTRADA,C.DATA_ENTRADA),'HH24:MI:SS') HORA_ENTRADA,
+TO_CHAR(NVL(RL.DATA_SAIDA,C.DATA_SAIDA),'DD/MM/YYYY') DATA_SAIDA,
+TO_CHAR(NVL(RL.DATA_SAIDA,C.DATA_SAIDA+0.5),'HH24:MI:SS') HORA_SAIDA,
+P.CIDADE CIDADE_PROCEDENCIA, P.ESTADO ESTADO_PROCEDENCIA, P.PAIS PAIS_PROCEDENCIA, D.CIDADE CIDADE_DESTINO, D.ESTADO ESTADO_DESTINO, D.PAIS PAIS_DESTINO,
+HOSP.EMAIL, HOSP.TELEFONE TEL_HOSPEDE, HOSP.CELULAR,HOSP.NASCIMENTO, ROUND((SYSDATE - HOSP.NASCIMENTO)/365) IDADE, HTL.CIDADE CIDADE_HOTEL, HTL.UF ESTADO_HOTEL,
+H.EMAIL EMAIL_HOTEL, H.CGC, H.INSC_EMBRATUR, H.CLASSIFICACAO, RH.NOME_FANTASIA NOME_REDE
+FROM HOTEL H, CHECKIN C, ROOM_LIST RL, HOSPEDE HOSP, V_CIDADE D, V_CIDADE P, V_CIDADE CID, PROFISSAO PROF, V_CIDADE HTL, REDE_HOTEL RH
+WHERE C.ID_CHECKIN = $P{P_CHECKIN}
+AND C.ID_HOTEL = H.ID_HOTEL
+AND H.ID_REDE_HOTEL = RH.ID_REDE_HOTEL
+--AND RL.DATA_SAIDA is NULL
+AND H.ID_CIDADE = HTL.ID_CIDADE
+AND C.ID_CIDADE_DESTINO = D.ID_CIDADE(+)
+AND C.ID_CIDADE_PROCEDENCIA = P.ID_CIDADE(+)
+AND C.ID_CHECKIN = RL.ID_CHECKIN
+AND RL.ID_HOSPEDE = HOSP.ID_HOSPEDE
+AND HOSP.ID_PROFISSAO = PROF.ID_PROFISSAO(+)
+AND HOSP.ID_CIDADE = CID.ID_CIDADE(+)
+
+UNION ALL
+
+SELECT RL.ID_ROOM_LIST, R.ID_HOTEL, R.ID_RESERVA, H.NOME_FANTASIA, H.RAZAO_SOCIAL, H.ENDERECO ||','||(TO_CHAR(REPLACE (H.NUMERO||','|| H.COMPLEMENTO||' - ' || H.BAIRRO||'-'||H.CEP,' '))) ENDERECO, H.CEP, '(' ||HTL.DDD || ')' || H.TELEFONE TELEFONE,PROF.PROFISSAO, CID.NACIONALIDADE,
+(HOSP.NOME_HOSPEDE) || ' ' || (HOSP.SOBRENOME_HOSPEDE) NOME, DECODE(HOSP.SEXO,'M','S') SEXO_M,DECODE(HOSP.SEXO,'F','S') SEXO_F,
+HOSP.IDENTIDADE, HOSP.ORGAO_EXPEDIDOR, HOSP.CPF,
+HOSP.ENDERECO ||','|| TO_CHAR(REPLACE(HOSP.NUMERO||','||HOSP.COMPLEMENTO||' - '||HOSP.BAIRRO||' - '||HOSP.CEP,' ')) RESIDENCIA_PERMANENTE, CID.CIDADE CIDADE_HOSPEDE,  CID.ESTADO ESTADO_HOSPEDE, CID.PAIS PAIS_HOSPEDE, NULL MOTIVO_VIAGEM, NULL MEIO_TRANSPORTE,
+TO_CHAR(R.DATA_ENTRADA,'DD/MM/YYYY') DATA_ENTRADA,
+TO_CHAR(R.DATA_ENTRADA+0.5,'HH24:MI:SS') HORA_ENTRADA,
+TO_CHAR(R.DATA_SAIDA,'DD/MM/YYYY') DATA_SAIDA,
+TO_CHAR(R.DATA_SAIDA+0.5,'HH24:MI:SS') HORA_SAIDA,
+NULL CIDADE_PROCEDENCIA, NULL ESTADO_PROCEDENCIA, NULL PAIS_PROCEDENCIA, NULL CIDADE_DESTINO, NULL ESTADO_DESTINO, NULL PAIS_DESTINO,
+HOSP.EMAIL, HOSP.TELEFONE TEL_HOSPEDE, HOSP.CELULAR, HOSP.NASCIMENTO, ROUND((SYSDATE - HOSP.NASCIMENTO)/365) IDADE, HTL.CIDADE CIDADE_HOTEL, HTL.UF ESTADO_HOTEL,
+H.EMAIL EMAIL_HOTEL, H.CGC, H.INSC_EMBRATUR, H.CLASSIFICACAO, RH.NOME_FANTASIA NOME_REDE
+FROM HOTEL H, RESERVA R, ROOM_LIST RL, HOSPEDE HOSP, V_CIDADE CID, PROFISSAO PROF, V_CIDADE HTL, REDE_HOTEL RH,RESERVA_APARTAMENTO RA
+WHERE R.ID_HOTEL = $P{IDH}
+AND R.ID_RESERVA LIKE $P{P_RESERVA}
+AND R.ID_HOTEL = H.ID_HOTEL
+AND H.ID_REDE_HOTEL = RH.ID_REDE_HOTEL
+AND H.ID_CIDADE = HTL.ID_CIDADE
+AND R.ID_RESERVA = RL.ID_RESERVA
+AND R.ID_RESERVA = RA.ID_RESERVA
+AND R.APAGADA = 'N'
+AND R.BLOQUEIO = 'N'
+AND RL.ID_HOSPEDE = HOSP.ID_HOSPEDE
+AND RL.ID_RESERVA_APARTAMENTO = RA.ID_RESERVA_APARTAMENTO
+AND HOSP.ID_PROFISSAO = PROF.ID_PROFISSAO(+)
+AND HOSP.ID_CIDADE = CID.ID_CIDADE(+)
+AND TRUNC(RA.DATA_ENTRADA) BETWEEN TO_DATE($P{P_DATA1},'DD/MM/YYYY') AND TO_DATE($P{P_DATA2},'DD/MM/YYYY')]]>
+	</queryString>
+	<field name="ID_ROOM_LIST" class="java.math.BigDecimal"/>
+	<field name="ID_HOTEL" class="java.math.BigDecimal"/>
+	<field name="ID_CHECKIN" class="java.math.BigDecimal"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="RAZAO_SOCIAL" class="java.lang.String"/>
+	<field name="ENDERECO" class="java.lang.String"/>
+	<field name="CEP" class="java.lang.String"/>
+	<field name="TELEFONE" class="java.lang.String"/>
+	<field name="PROFISSAO" class="java.lang.String"/>
+	<field name="NACIONALIDADE" class="java.lang.String"/>
+	<field name="NOME" class="java.lang.String"/>
+	<field name="SEXO_M" class="java.lang.String"/>
+	<field name="SEXO_F" class="java.lang.String"/>
+	<field name="IDENTIDADE" class="java.lang.String"/>
+	<field name="ORGAO_EXPEDIDOR" class="java.lang.String"/>
+	<field name="CPF" class="java.lang.String"/>
+	<field name="RESIDENCIA_PERMANENTE" class="java.lang.String"/>
+	<field name="CIDADE_HOSPEDE" class="java.lang.String"/>
+	<field name="ESTADO_HOSPEDE" class="java.lang.String"/>
+	<field name="PAIS_HOSPEDE" class="java.lang.String"/>
+	<field name="MOTIVO_VIAGEM" class="java.lang.String"/>
+	<field name="MEIO_TRANSPORTE" class="java.lang.String"/>
+	<field name="DATA_ENTRADA" class="java.lang.String"/>
+	<field name="HORA_ENTRADA" class="java.lang.String"/>
+	<field name="DATA_SAIDA" class="java.lang.String"/>
+	<field name="HORA_SAIDA" class="java.lang.String"/>
+	<field name="CIDADE_PROCEDENCIA" class="java.lang.String"/>
+	<field name="ESTADO_PROCEDENCIA" class="java.lang.String"/>
+	<field name="PAIS_PROCEDENCIA" class="java.lang.String"/>
+	<field name="CIDADE_DESTINO" class="java.lang.String"/>
+	<field name="ESTADO_DESTINO" class="java.lang.String"/>
+	<field name="PAIS_DESTINO" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="TEL_HOSPEDE" class="java.lang.String"/>
+	<field name="CELULAR" class="java.lang.String"/>
+	<field name="NASCIMENTO" class="java.sql.Timestamp"/>
+	<field name="IDADE" class="java.math.BigDecimal"/>
+	<field name="CIDADE_HOTEL" class="java.lang.String"/>
+	<field name="ESTADO_HOTEL" class="java.lang.String"/>
+	<field name="EMAIL_HOTEL" class="java.lang.String"/>
+	<field name="CGC" class="java.lang.String"/>
+	<field name="INSC_EMBRATUR" class="java.lang.String"/>
+	<field name="CLASSIFICACAO" class="java.lang.String"/>
+	<field name="NOME_REDE" class="java.lang.String"/>
+	<group name="checkInReportGroup" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{ID_ROOM_LIST}]]></groupExpression>
+		<groupFooter>
+			<band height="24" splitType="Prevent"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="134" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="68" y="63" width="230" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="68" y="87" width="230" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENDERECO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="481" y="87" width="64" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CEP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="355" y="87" width="91" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TELEFONE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="374" height="18"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FICHA NACIONAL DE REGISTRO DE HÓSPEDES - FNRH]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="0" width="119" height="18"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No._______________]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="14" y="18" width="133" height="14"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GOVERNO DO ESTADO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="18" width="119" height="22"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMBRATUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="51" width="62" height="11"/>
+				<textElement markup="none">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Razão Social]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="63" width="62" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Nome Fantasia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="75" width="53" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Rede:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="87" width="53" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Endereço:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="100" width="53" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Estado:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="114" y="100" width="38" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Município:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="51" width="35" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CNPJ:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="63" width="35" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Cadastur:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="75" width="35" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Tipo:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="75" width="21" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Cat:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="87" width="22" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CEP:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="100" width="35" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Email:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="87" width="35" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Telefone:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="68" y="75" width="229" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_REDE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="179" y="100" width="100" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="355" y="100" width="190" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMAIL_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="355" y="51" width="190" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CGC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="355" y="63" width="190" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INSC_EMBRATUR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="481" y="75" width="66" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLASSIFICACAO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="216" y="19" width="122" height="21"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="32" width="100" height="18"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTADO_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="51" width="230" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RAZAO_SOCIAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="68" y="99" width="29" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTADO_HOTEL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="398" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="42" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="4" y="1" width="87" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Nome completo - Full name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="24" width="87" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Celular - Cell Phone]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="61" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="2" y="43" width="87" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Profissão - Occupation]]></text>
+			</staticText>
+			<line>
+				<reportElement x="434" y="42" width="1" height="19"/>
+			</line>
+			<staticText>
+				<reportElement x="131" y="43" width="87" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Nacionalidade - Citizenship]]></text>
+			</staticText>
+			<line>
+				<reportElement x="300" y="42" width="1" height="19"/>
+			</line>
+			<line>
+				<reportElement x="128" y="42" width="1" height="19"/>
+			</line>
+			<staticText>
+				<reportElement x="302" y="43" width="87" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Data Nasc. - Birth date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="43" width="59" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Gênero - Gender]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="67" width="153" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Documento de Identidade - Travel Document]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="77" width="56" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Órgão Expedidor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="399" y="67" width="120" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[CPF - BRAZILIAN DOCUMENT]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="124" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="2" y="104" width="139" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Residência permanente-Permanent Adress]]></text>
+			</staticText>
+			<line>
+				<reportElement x="310" y="103" width="1" height="21"/>
+			</line>
+			<staticText>
+				<reportElement x="318" y="104" width="93" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Cidade, estado  -    City, state]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="489" y="104" width="53" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[País - Country]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="162" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="5" y="128" width="202" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Ultima procedência - Arriving]]></text>
+			</staticText>
+			<line>
+				<reportElement x="300" y="127" width="1" height="35"/>
+			</line>
+			<staticText>
+				<reportElement x="305" y="129" width="202" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Próximo destino - Next Destination]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="168" width="202" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Motivo da Viagem - Purpose of trip]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="205" width="117" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Meio de Transporte - Arriving by]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="215" width="25" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Avião]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="225" width="25" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Plane]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="274" y="215" width="53" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Navio - Barco]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="274" y="225" width="53" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Ship - Ferry Boat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="74" y="215" width="39" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Automóvel]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="74" y="225" width="39" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Car]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="215" width="25" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Ônibus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="225" width="25" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Bus]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="166" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="236" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="8" y="320" width="68" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dia - Mês - Ano:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="151" y="320" width="26" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Hora:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="289" y="320" width="68" height="11"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dia - Mês - Ano]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="320" width="26" height="12"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Hora:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="397" width="555" height="1"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="10" width="551" height="9"/>
+				<textElement>
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="52" width="124" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROFISSAO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="129" y="52" width="150" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NACIONALIDADE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="313" y="87" width="74" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGAO_EXPEDIDOR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="401" y="87" width="105" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CPF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="318" y="115" width="79" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="405" y="115" width="79" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTADO_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="489" y="115" width="65" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAIS_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="196" y="150" width="80" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_PROCEDENCIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="8" y="151" width="89" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAIS_PROCEDENCIA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="467" y="150" width="88" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CIDADE_DESTINO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="382" y="150" width="81" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTADO_DESTINO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="304" y="31" width="100" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEL_HOSPEDE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="475" y="51" width="8" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[M]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="513" y="51" width="8" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[F]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="497" y="51" width="12" height="9"/>
+			</rectangle>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="357" y="320" width="71" height="12"/>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_SAIDA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="475" y="51" width="6" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="2" y="115" width="295" height="9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RESIDENCIA_PERMANENTE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="33" width="292" height="9"/>
+				<textElement textAlignment="Left">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="434" y="23" width="1" height="21"/>
+			</line>
+			<staticText>
+				<reportElement x="302" y="22" width="87" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Telefone - Phone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="24" width="89" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Email]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="454" y="51" width="14" height="9"/>
+			</rectangle>
+			<line>
+				<reportElement x="281" y="302" width="275" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="302" width="272" height="1"/>
+			</line>
+			<line>
+				<reportElement x="1" y="332" width="271" height="1"/>
+			</line>
+			<line>
+				<reportElement x="281" y="332" width="275" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="302" width="1" height="31"/>
+			</line>
+			<line>
+				<reportElement x="555" y="303" width="1" height="29"/>
+			</line>
+			<line>
+				<reportElement x="281" y="303" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement x="271" y="302" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement x="337" y="243" width="1" height="54"/>
+			</line>
+			<line>
+				<reportElement x="1" y="298" width="337" height="1"/>
+			</line>
+			<line>
+				<reportElement x="1" y="242" width="337" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="242" width="1" height="56"/>
+			</line>
+			<line>
+				<reportElement x="354" y="272" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="354" y="272" width="202" height="1"/>
+			</line>
+			<line>
+				<reportElement x="555" y="272" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="354" y="297" width="202" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="362" y="243" width="106" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NÚMERO DE HÓSPEDES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="362" y="255" width="106" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NUMBER OF GUEST]]></text>
+			</staticText>
+			<line>
+				<reportElement x="555" y="241" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="354" y="241" width="1" height="26"/>
+			</line>
+			<line>
+				<reportElement x="354" y="266" width="202" height="1"/>
+			</line>
+			<line>
+				<reportElement x="354" y="241" width="202" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="362" y="274" width="106" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UH N°.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="243" width="106" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[OBSERVAÇÕES - NOTES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="14" y="302" width="106" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ENTRADA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="302" width="106" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[SAIDA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="372" width="160" height="12"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Assinatura do Hóspede - Guest Signature: ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="199" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="205" y="225" width="39" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Motorcycle]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="205" y="215" width="39" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Moto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="225" width="27" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Train]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="215" width="27" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Trem]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="419" y="215" width="34" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Outro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="419" y="225" width="27" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Other]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="189" width="58" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Convention-Fair]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="178" width="55" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Estudos-Cursos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="16" y="188" width="59" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Leisure-Vacation]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="2" y="181" width="12" height="14"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="142" y="178" width="65" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Congresso-Feiras]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="188" width="63" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Relatives-Friends]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="16" y="178" width="46" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Lazer-Férias]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="178" width="58" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Parentes-Amigos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="188" width="53" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Studies-Course]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="92" y="189" width="30" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Business]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="92" y="179" width="32" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Negócios]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="78" y="181" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="128" y="181" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="207" y="181" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="285" y="181" width="12" height="14"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="375" y="187" width="32" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Religion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="177" width="30" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Religião]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="359" y="181" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="410" y="181" width="12" height="14"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="424" y="187" width="21" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Health]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="424" y="177" width="21" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Saúde]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="467" y="187" width="33" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Shopping]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="453" y="181" width="12" height="14"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="467" y="177" width="30" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Compras]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="519" y="187" width="21" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Other]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="505" y="181" width="12" height="14"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="519" y="177" width="21" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Outro]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="2" y="218" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="56" y="218" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="126" y="218" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="332" y="218" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="190" y="218" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="257" y="218" width="12" height="14"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="399" y="218" width="12" height="14"/>
+			</rectangle>
+			<line>
+				<reportElement x="0" y="128" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement x="555" y="127" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement x="0" y="127" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="5" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[País]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Country]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="306" y="52" width="100" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NASCIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="42" y="87" width="101" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IDENTIDADE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="320" width="68" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="320" width="86" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HORA_ENTRADA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="459" y="320" width="91" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HORA_SAIDA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="439" y="33" width="100" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CELULAR}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="166" width="1" height="33"/>
+			</line>
+			<line>
+				<reportElement x="181" y="384" width="373" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="206" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="206" width="1" height="31"/>
+			</line>
+			<line>
+				<reportElement x="555" y="206" width="1" height="31"/>
+			</line>
+			<line>
+				<reportElement x="555" y="166" width="1" height="33"/>
+			</line>
+			<line>
+				<reportElement x="555" y="103" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement x="0" y="103" width="1" height="20"/>
+			</line>
+			<line>
+				<reportElement x="0" y="103" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="66" width="388" height="1"/>
+			</line>
+			<line>
+				<reportElement x="554" y="66" width="1" height="32"/>
+			</line>
+			<line>
+				<reportElement x="554" y="43" width="1" height="18"/>
+			</line>
+			<line>
+				<reportElement x="0" y="43" width="1" height="19"/>
+			</line>
+			<line>
+				<reportElement x="0" y="21" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="1" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement x="300" y="21" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement x="0" y="23" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement x="98" y="142" width="1" height="20"/>
+			</line>
+			<line>
+				<reportElement x="190" y="141" width="1" height="20"/>
+			</line>
+			<staticText>
+				<reportElement x="100" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Estado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="135" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[State]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[City]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="195" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Cidade]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="149" width="77" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTADO_PROCEDENCIA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="305" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[País]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="337" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Country]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="383" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Estado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="411" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[State]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="467" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Cidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="501" y="141" width="28" height="10"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[City]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="306" y="150" width="72" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAIS_DESTINO}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="380" y="142" width="1" height="20"/>
+			</line>
+			<line>
+				<reportElement x="465" y="142" width="1" height="20"/>
+			</line>
+			<line>
+				<reportElement x="0" y="339" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="339" width="1" height="58"/>
+			</line>
+			<line>
+				<reportElement x="555" y="340" width="1" height="58"/>
+			</line>
+			<line>
+				<reportElement x="554" y="0" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement x="0" y="1" width="555" height="1"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="459" y="50" width="9" height="10"/>
+				<textElement textAlignment="Justified">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEXO_M}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="498" y="50" width="12" height="10"/>
+				<textElement textAlignment="Justified">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEXO_F}.equals("N")?"":"X"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="77" width="30" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Número]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="5" y="87" width="30" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="147" y="77" width="30" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="147" y="87" width="30" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="87" width="56" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Issuing country]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="66" width="1" height="32"/>
+			</line>
+			<line>
+				<reportElement x="1" y="98" width="388" height="1"/>
+			</line>
+			<line>
+				<reportElement x="388" y="66" width="1" height="32"/>
+			</line>
+			<line>
+				<reportElement x="395" y="66" width="1" height="32"/>
+			</line>
+			<line>
+				<reportElement x="395" y="66" width="159" height="1"/>
+			</line>
+			<line>
+				<reportElement x="395" y="98" width="159" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="147" y="104" width="157" height="9"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[(Endereço completo - Bairro - CEP)]]></text>
+			</staticText>
+			<line>
+				<reportElement x="554" y="23" width="1" height="21"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="12" splitType="Stretch">
+			<staticText>
+				<reportElement x="490" y="1" width="26" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="528" y="1" width="14" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="516" y="1" width="11" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="543" y="1" width="11" height="9"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="23">
+			<subreport>
+				<reportElement x="1" y="0" width="555" height="23"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

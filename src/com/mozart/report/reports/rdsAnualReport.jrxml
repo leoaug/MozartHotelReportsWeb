@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rdsAnualReport" language="groovy" pageWidth="870" pageHeight="595" orientation="Landscape" columnWidth="830" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["RDS Anual"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select *
+from RDS_ANUAL_TMP
+where id_hotel= $P{IDH}
+ORDER BY ORDENACAO]]>
+	</queryString>
+	<field name="ID_TIPO_LANCAMENTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DESCRICAO_LANCAMENTO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES1" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES2" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES3" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES4" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES5" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES6" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES7" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES8" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES9" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES10" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES11" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MES12" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="GRUPO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ANO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ORDENACAO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_HOTEL" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="V_TOTAL_ANO" class="java.lang.Double" resetType="Group" resetGroup="GRUPO_Report">
+		<variableExpression><![CDATA[($F{MES1}==null?new Double(0):$F{MES1})+
+($F{MES2}==null?new Double(0):$F{MES2})+
+($F{MES3}==null?new Double(0):$F{MES3})+
+($F{MES4}==null?new Double(0):$F{MES4})+
+($F{MES5}==null?new Double(0):$F{MES5})+
+($F{MES6}==null?new Double(0):$F{MES6})+
+($F{MES7}==null?new Double(0):$F{MES7})+
+($F{MES8}==null?new Double(0):$F{MES8})+
+($F{MES9}==null?new Double(0):$F{MES9})+
+($F{MES10}==null?new Double(0):$F{MES10})+
+($F{MES11}==null?new Double(0):$F{MES11})+
+($F{MES12}==null?new Double(0):$F{MES12})]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="V_MEDIA_ANO" class="java.lang.Double" resetType="Group" resetGroup="GRUPO_Report">
+		<variableExpression><![CDATA[($F{MES1}==null?new Double(0):new Double(1))+
+($F{MES2}==null?new Double(0):new Double(1))+
+($F{MES3}==null?new Double(0):new Double(1))+
+($F{MES4}==null?new Double(0):new Double(1))+
+($F{MES5}==null?new Double(0):new Double(1))+
+($F{MES6}==null?new Double(0):new Double(1))+
+($F{MES7}==null?new Double(0):new Double(1))+
+($F{MES8}==null?new Double(0):new Double(1))+
+($F{MES9}==null?new Double(0):new Double(1))+
+($F{MES10}==null?new Double(0):new Double(1))+
+($F{MES11}==null?new Double(0):new Double(1))+
+($F{MES12}==null?new Double(0):new Double(1))]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<group name="GRUPO_Report">
+		<groupExpression><![CDATA[$F{GRUPO}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField>
+					<reportElement x="0" y="0" width="100" height="13"/>
+					<textElement>
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{GRUPO}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="52">
+				<subreport>
+					<reportElement x="0" y="9" width="830" height="39"/>
+					<subreportParameter name="IDH">
+						<subreportParameterExpression><![CDATA[$P{IDH}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="P_GRUPO">
+						<subreportParameterExpression><![CDATA[$F{GRUPO}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "rdsAnualSubTotalReport.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="DESCRICAO_GROUP">
+		<groupExpression><![CDATA[$F{DESCRICAO_LANCAMENTO}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<image hAlign="Right">
+				<reportElement x="751" y="0" width="79" height="58"/>
+				<imageExpression><![CDATA[$P{LOGO_HOTEL}]]></imageExpression>
+			</image>
+			<image hAlign="Left">
+				<reportElement x="1" y="0" width="79" height="58"/>
+				<imageExpression><![CDATA[$P{LOGO_MOZART}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="318" y="6" width="199" height="15" forecolor="#000033"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOME_HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="271" y="59" width="311" height="10"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TEXT_FIELD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="349" y="45" width="66" height="13" forecolor="#000033"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{FRONT_OFFICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="481" y="45" width="69" height="13" forecolor="#000033"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="283" y="45" width="66" height="13" forecolor="#000033"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Front Office:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="436" y="45" width="45" height="13" forecolor="#000033"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Emissão:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="351" y="26" width="132" height="14" forecolor="#000033"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RDS Anual]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="101" y="0" width="45" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ano]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="147" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="196" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fev]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="245" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="294" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Abr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="343" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="394" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jun]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="445" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jul]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ago]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="546" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Set]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="596" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="645" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nov]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="695" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dez]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="0" width="78" height="14"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total/Média]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="824" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRICAO_LANCAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0000" isBlankWhenNull="true">
+				<reportElement x="101" y="0" width="45" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ANO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="146" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="195" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="244" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="293" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="342" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES5}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="393" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES6}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="444" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES7}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="496" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES8}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="545" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES9}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="595" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES10}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="644" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES11}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="694" y="0" width="48" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MES12}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="744" y="0" width="30" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="13" width="30" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Média:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="775" y="0" width="55" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{V_TOTAL_ANO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="774" y="13" width="56" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Double($V{V_TOTAL_ANO}/($V{V_MEDIA_ANO}==new Double(0)?new Double(1):$V{V_MEDIA_ANO}))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="739" y="4" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="812" y="4" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="775" y="4" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="793" y="4" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="2" width="830" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

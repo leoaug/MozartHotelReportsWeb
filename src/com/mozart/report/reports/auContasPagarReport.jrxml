@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContasPagarReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="820" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.csv.field.delimiter" value=";"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<style name="DEFAULT" isDefault="true" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="IDH" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT TO_CHAR (CP.DATA_LANCAMENTO, 'DD/MM/YYYY') DATA,
+         REPLACE (TO_CHAR ( (CP.DATA_VENCIMENTO - CP.DATA_LANCAMENTO), '900'), ' ','') || DECODE ( (CP.DATA_VENCIMENTO - CP.DATA_LANCAMENTO), 1, ' DIA', ' DIAS') DIAS,
+         H.NOME_FANTASIA HOTEL,
+         CP.NUM_DOCUMENTO || CP.NUM_PARCELAS NUMERO,
+         TO_CHAR (E.CGC) CNPJ,
+         TO_CHAR (CP.DATA_VENCIMENTO, 'DD/MM/YYYY') VENCIMENTO,
+         CP.ID_CONTAS_PAGAR ID_MOVIMENTO,
+         CP.VALOR_BRUTO VALOR,
+         CP.JUROS,
+         CP.DESCONTO
+    FROM CONTAS_PAGAR CP
+         JOIN HOTEL H
+            ON (CP.ID_HOTEL = H.ID_HOTEL)
+         JOIN EMPRESA E
+            ON (CP.ID_FORNECEDOR = E.ID_EMPRESA)
+   WHERE CP.ID_HOTEL = $P{IDH}
+         AND CP.VALOR_BRUTO > 0
+         AND TRUNC(CP.DATA_LANCAMENTO) BETWEEN  TO_DATE($P{P_DATA},'DD/MM/YYYY') AND TO_DATE($P{P_DATA_FIM},'DD/MM/YYYY')
+ORDER BY CP.DATA_LANCAMENTO, H.NOME_FANTASIA]]>
+	</queryString>
+	<field name="DATA" class="java.lang.String"/>
+	<field name="DIAS" class="java.lang.String"/>
+	<field name="HOTEL" class="java.lang.String"/>
+	<field name="NUMERO" class="java.lang.String"/>
+	<field name="CNPJ" class="java.lang.String"/>
+	<field name="VENCIMENTO" class="java.lang.String"/>
+	<field name="ID_MOVIMENTO" class="java.math.BigDecimal"/>
+	<field name="VALOR" class="java.math.BigDecimal"/>
+	<field name="JUROS" class="java.math.BigDecimal"/>
+	<field name="DESCONTO" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="16">
+			<staticText>
+				<reportElement x="1" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[DATA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="51" y="0" width="20" height="14"/>
+				<textElement/>
+				<text><![CDATA[DIAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="332" y="0" width="55" height="14"/>
+				<textElement/>
+				<text><![CDATA[VENCIMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="196" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[NUMERO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[CNPJ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="416" y="0" width="77" height="14"/>
+				<textElement/>
+				<text><![CDATA[ID_MOVIMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="546" y="0" width="60" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[VALOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="648" y="0" width="60" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[JUROS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="737" y="0" width="60" height="14"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[DESCONTOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="0" width="50" height="14"/>
+				<textElement/>
+				<text><![CDATA[HOTEL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="416" y="0" width="77" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ID_MOVIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="51" y="0" width="20" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{DIAS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="196" y="0" width="52" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{NUMERO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="252" y="0" width="73" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CNPJ}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="332" y="0" width="55" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{VENCIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="0" width="125" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{HOTEL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="50" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{DATA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="546" y="0" width="60" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{VALOR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="737" y="0" width="60" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DESCONTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement x="648" y="0" width="60" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{JUROS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="controlaDataReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="ESTOQUE">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_ESTOQUE}]]></conditionExpression>
+			<style forecolor="#CC0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="FATURAMENTO">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_FATURAMENTO}]]></conditionExpression>
+			<style forecolor="#FF0000" backcolor="#FFFFFF" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="C.RECEBER">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_C.RECEBER}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="C.PAGAR">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_C.PAGAR}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="TESOURARIA">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_TESOURARIA}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="TES.CONCILIADO">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_TES.CONCILIADO}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="TES.BOLETIM">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_TES.BOLETIM}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="TES.PROVISÃO">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_TES.PROVISAO}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="CONTABILIDADE">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_CONTABILIDADE}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<style name="CTB.CONSOLIDADO">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{V_CTB.CONSOLIDADO}]]></conditionExpression>
+			<style forecolor="#FF0000" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="ADM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Controla Data"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT H.SIGLA, CD.FRONT_OFFICE, CD.ESTOQUE, CD.FATURAMENTO_CONTAS_RECEBER FATURAMENTO, CD.CONTAS_RECEBER, CD.CONTAS_PAGAR, CD.TESOURARIA,
+ MAX(T.DATA_CONCILIADO) TES_CONCILIADO, TT2.BOLETIM TES_BOLETIM,  TTT2.PROVISAO TES_PROVISAO,
+CD.CONTABILIDADE,
+MC2.CONSOLIDACAO CONT_CONSOLIDADO
+FROM CONTROLA_DATA CD
+JOIN HOTEL H ON(CD.ID_HOTEL = H.ID_HOTEL AND H.ATIVO = 'S')
+LEFT JOIN TESOURARIA T ON (H.ID_HOTEL = T.ID_HOTEL)
+LEFT JOIN
+
+(
+SELECT MAX(TT.DATA_LANCAMENTO) BOLETIM, CC.ID_HOTEL
+FROM CONTROLA_DATA CD, CONTA_CORRENTE CC, TESOURARIA TT
+WHERE CD.ID_HOTEL = DECODE ($P{ADM}, 'S', CD.ID_HOTEL, $P{IDH}) AND CD.ID_REDE_HOTEL = $P{IDRH} AND CD.ID_HOTEL = CC.ID_HOTEL AND CC.CONTA_CORRENTE = TT.CONTA_CORRENTE AND CC.ID_HOTEL = TT.ID_HOTEL AND TT.DEBITO_CREDITO ='C'
+AND CC.CARTEIRA = 'S'
+GROUP BY  CC.ID_HOTEL
+
+) TT2 ON (H.ID_HOTEL = TT2.ID_HOTEL)
+LEFT JOIN
+
+(SELECT MAX(TTT.DATA_LANCAMENTO) PROVISAO, TTT.ID_HOTEL FROM TESOURARIA TTT, CONTROLA_DATA CD
+WHERE CD.ID_HOTEL = DECODE ($P{ADM}, 'S', CD.ID_HOTEL, $P{IDH}) AND CD.ID_REDE_HOTEL = $P{IDRH} AND CD.ID_HOTEL = TTT.ID_HOTEL AND TTT.NUM_DOCUMENTO LIKE 'PRO%' GROUP BY TTT.ID_HOTEL) TTT2
+ON (H.ID_HOTEL = TTT2.ID_HOTEL)
+LEFT JOIN
+(SELECT MIN(MC.DATA_DOCUMENTO) CONSOLIDACAO, MC.ID_HOTEL
+FROM MOVIMENTO_CONTABIL MC, CONTROLA_DATA CD
+WHERE CD.ID_HOTEL = DECODE ($P{ADM}, 'S', CD.ID_HOTEL, $P{IDH}) AND CD.ID_REDE_HOTEL = $P{IDRH} AND CD.ID_HOTEL = MC.ID_HOTEL
+AND MC.TIPO_MOVIMENTO ='A' GROUP BY MC.ID_HOTEL ) MC2
+
+ON (H.ID_HOTEL = MC2.ID_HOTEL)
+WHERE CD.ID_HOTEL = DECODE ($P{ADM}, 'S', CD.ID_HOTEL, $P{IDH}) AND CD.ID_REDE_HOTEL = $P{IDRH}
+GROUP BY H.SIGLA, CD.FRONT_OFFICE, CD.FATURAMENTO_CONTAS_RECEBER, CD.CONTABILIDADE, CD.CONTAS_PAGAR, CD.TESOURARIA,
+CD.CONTAS_RECEBER, CD.ESTOQUE,TT2.BOLETIM, TTT2.PROVISAO, MC2.CONSOLIDACAO]]>
+	</queryString>
+	<field name="SIGLA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FRONT_OFFICE" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ESTOQUE" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FATURAMENTO" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CONTAS_RECEBER" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CONTAS_PAGAR" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TESOURARIA" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TES_CONCILIADO" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TES_BOLETIM" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TES_PROVISAO" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CONTABILIDADE" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CONT_CONSOLIDADO" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="V_ESTOQUE" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{ESTOQUE})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_FATURAMENTO" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{FATURAMENTO})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_C.RECEBER" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{CONTAS_RECEBER})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_C.PAGAR" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{CONTAS_PAGAR})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_TESOURARIA" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{TESOURARIA})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_TES.CONCILIADO" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{TES_CONCILIADO})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_TES.BOLETIM" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{TES_BOLETIM})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_TES.PROVISAO" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{TES_PROVISAO})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_CONTABILIDADE" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{CONTABILIDADE})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<variable name="V_CTB.CONSOLIDADO" class="java.lang.Boolean">
+		<variableExpression><![CDATA[new Boolean($F{FRONT_OFFICE}.compareTo($F{CONT_CONSOLIDADO})==1)]]></variableExpression>
+		<initialValueExpression><![CDATA[Boolean.TRUE]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy HH:mm:ss">
+				<reportElement x="405" y="35" width="98" height="13" forecolor="#000066"/>
+				<textElement textAlignment="Left" markup="none">
+					<font fontName="SansSerif" size="7" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="298" y="18" width="221" height="15" forecolor="#000066"/>
+				<textElement textAlignment="Center">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Controla Data]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="298" y="2" width="221" height="16" forecolor="#000099"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" markup="none">
+					<font fontName="DejaVu Serif" size="12" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOME_HOTEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="337" y="35" width="68" height="13" forecolor="#000066"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Data emissão:]]></text>
+			</staticText>
+			<image hAlign="Right">
+				<reportElement x="701" y="1" width="101" height="48"/>
+				<imageExpression><![CDATA[$P{LOGO_HOTEL}]]></imageExpression>
+				<anchorNameExpression><![CDATA[$P{LOGO_HOTEL}]]></anchorNameExpression>
+			</image>
+			<image hAlign="Left">
+				<reportElement x="0" y="0" width="101" height="48"/>
+				<imageExpression><![CDATA[$P{LOGO_MOZART}]]></imageExpression>
+				<anchorNameExpression><![CDATA[$P{LOGO_MOZART}]]></anchorNameExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="1" width="62" height="13"/>
+				<textElement/>
+				<text><![CDATA[Hotel]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="63" y="1" width="64" height="13"/>
+				<textElement/>
+				<text><![CDATA[Front Office]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="1" width="64" height="13"/>
+				<textElement/>
+				<text><![CDATA[Estoque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="193" y="1" width="64" height="13"/>
+				<textElement/>
+				<text><![CDATA[Faturamento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="258" y="1" width="53" height="13"/>
+				<textElement/>
+				<text><![CDATA[C. Receber]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="1" width="53" height="13"/>
+				<textElement/>
+				<text><![CDATA[C. Pagar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="1" width="53" height="13"/>
+				<textElement/>
+				<text><![CDATA[Tesouraria]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="1" width="71" height="13"/>
+				<textElement/>
+				<text><![CDATA[Tes. Conciliado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="503" y="1" width="71" height="13"/>
+				<textElement/>
+				<text><![CDATA[Tes. Boletim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="1" width="71" height="13"/>
+				<textElement/>
+				<text><![CDATA[Tes. Provisão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="648" y="1" width="71" height="13"/>
+				<textElement/>
+				<text><![CDATA[Contabilidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="719" y="1" width="81" height="13"/>
+				<textElement/>
+				<text><![CDATA[Ctb. Consolidado]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="15" width="802" height="1"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="1" width="62" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SIGLA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="63" y="1" width="64" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FRONT_OFFICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="ESTOQUE" x="128" y="1" width="64" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTOQUE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="FATURAMENTO" x="193" y="1" width="64" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FATURAMENTO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="C.RECEBER" x="258" y="1" width="53" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTAS_RECEBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="C.PAGAR" x="312" y="1" width="53" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTAS_PAGAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="TESOURARIA" x="370" y="1" width="53" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TESOURARIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="TES.CONCILIADO" x="428" y="1" width="71" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TES_CONCILIADO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="TES.BOLETIM" x="503" y="1" width="71" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TES_BOLETIM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="TES.PROVISÃO" x="576" y="1" width="71" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TES_PROVISAO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="CONTABILIDADE" x="648" y="1" width="71" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONTABILIDADE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="CTB.CONSOLIDADO" x="719" y="1" width="81" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CONT_CONSOLIDADO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="771" y="3" width="11" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="717" y="3" width="35" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="790" y="3" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="753" y="3" width="11" height="12"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="1" width="802" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

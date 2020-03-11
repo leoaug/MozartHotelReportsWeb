@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TesteQRCODE" pageWidth="340" pageHeight="800" whenNoDataType="NoDataSection" columnWidth="340" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.357947691000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDNOTA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select qrcode,num_nota from status_nota where id_nota = $P{IDNOTA}]]>
+	</queryString>
+	<field name="QRCODE" class="java.lang.String"/>
+	<field name="NUM_NOTA" class="java.lang.String"/>
+	<detail>
+		<band height="219" splitType="Stretch">
+			<image onErrorType="Blank">
+				<reportElement x="100" y="12" width="300" height="150"/>
+				<imageExpression><![CDATA[com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage(
+new com.google.zxing.qrcode.QRCodeWriter().encode(
+$F{QRCODE},
+com.google.zxing.BarcodeFormat.QR_CODE, 300,300))]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="172" width="340" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Informações de interesse do Contribuinte]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="203" width="50" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PDV Innovate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="126" y="187" width="35" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Mesa: ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="164" y="187" width="74" height="13"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUM_NOTA}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="209" width="290" height="1"/>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

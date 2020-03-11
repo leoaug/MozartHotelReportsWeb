@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="movimentacaoRevenueReservasReport" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="573" leftMargin="11" rightMargin="11" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.610510000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<import value="net.sf.jasperreports.export.xls.*"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="IDRH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<parameter name="P_DATA_FIM" class="java.lang.String"/>
+	<parameter name="NOME_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_HOTEL" class="java.lang.String"/>
+	<parameter name="LOGO_MOZART" class="java.lang.String"/>
+	<parameter name="FRONT_OFFICE" class="java.lang.String"/>
+	<parameter name="TEXT_FIELD" class="java.lang.String"/>
+	<parameter name="TITULO" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Movimentação de Reservas"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT to_char(DIAS.DATA,'dd')+0 vdia
+, VR.TIPO,VR.DATA
+, O.DIA
+, VR.TOTALDIARIA
+, (VR.TOTALDIARIA/O.DIA) DIARIAMEDIA
+, ((O.DIA*100)/APT.TOTAL) PERC_OCUPACAO_DIA
+, OC.OCUPADOS
+, APT.TOTAL
+, ACM_MES.MES
+, ACM_MES.TOTALTARIFA TOTALTARIFA_MES
+, (ACM_MES.TOTALTARIFA/ACM_MES.OCUPADO_MES)  DIARIAMEDIA_MES
+, DECODE(VR.TIPO,'A','Total Ano Anterior','Total do Ano') TITULO_GRUPO
+
+
+FROM
+
+(SELECT DATA, TO_CHAR(DATA,'D') DIA
+FROM  TABLE(CAST(GETDIAS(TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'),'MONTH'),to_date($P{P_DATA_FIM},'DD/MM/YYYY')-TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'),'MONTH')) AS DATA_OBJTAB))
+
+UNION
+
+SELECT DATA, TO_CHAR(DATA,'D') DIA
+FROM TABLE(CAST(GETDIAS( TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365,'MONTH'),to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365-TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365,'MONTH')) AS DATA_OBJTAB))) DIAS
+,
+
+(SELECT
+'B' TIPO,trunc(RAD.DATA) DATA,SUM(DECODE(RAD.ID_MOEDA,1,RAD.TARIFA,RAD.TARIFA*VD.VALOR_DOLAR)) TOTALDIARIA
+FROM RESERVA_APARTAMENTO_DIARIA RAD
+JOIN RESERVA R ON (RAD.ID_RESERVA = R.ID_RESERVA)
+JOIN CONTROLA_DATA CD ON (RAD.ID_HOTEL = CD.ID_HOTEL)
+LEFT JOIN VALOR_DOLAR VD ON (RAD.ID_HOTEL = VD.ID_HOTEL AND RAD.ID_MOEDA = VD.ID_MOEDA AND CD.FRONT_OFFICE = VD.DATA)
+WHERE RAD.ID_HOTEL = $P{IDH}
+AND TRUNC(RAD.DATA) BETWEEN TRUNC(to_Date($P{P_DATA_FIM},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA_FIM},'dd/mm/YYYY')
+AND TRUNC(RAD.DATA) <=  TRUNC(R.DATA_SAIDA)
+AND TRUNC(RAD.DATA) >= CD.FRONT_OFFICE
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY trunc(RAD.DATA)
+UNION
+SELECT 'B' TIPO,trunc(MA.DATA_LANCAMENTO)DATA, SUM(MA.VALOR_LANCAMENTO)
+ FROM MOVIMENTO_APARTAMENTO MA
+ JOIN TIPO_LANCAMENTO TL ON  (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO)
+ JOIN CONTROLA_DATA CD ON (MA.ID_HOTEL = CD.ID_HOTEL)
+ WHERE MA.ID_HOTEL = $P{IDH}
+ AND TRUNC(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_Date($P{P_DATA_FIM},'dd/mm/YYYY'),'MONTH') AND to_Date($P{P_DATA_FIM},'dd/mm/YYYY')
+AND TRUNC(MA.DATA_LANCAMENTO) < CD.FRONT_OFFICE
+ AND TL.ID_IDENTIFICA_LANCAMENTO IN (2,3,26,28)
+ GROUP BY trunc(MA.DATA_LANCAMENTO)
+
+UNION
+
+SELECT 'A' TIPO,trunc(RAD.DATA) DATA,SUM(DECODE(RAD.ID_MOEDA,1,RAD.TARIFA,RAD.TARIFA*VD.VALOR_DOLAR)) TOTALDIARIAANT
+FROM RESERVA_APARTAMENTO_DIARIA RAD
+JOIN RESERVA R ON (RAD.ID_RESERVA = R.ID_RESERVA)
+JOIN CONTROLA_DATA CD ON (RAD.ID_HOTEL = CD.ID_HOTEL)
+LEFT JOIN VALOR_DOLAR VD ON (RAD.ID_HOTEL = VD.ID_HOTEL AND RAD.ID_MOEDA = VD.ID_MOEDA AND CD.FRONT_OFFICE-365 = VD.DATA)
+WHERE RAD.ID_HOTEL = $P{IDH}
+AND TRUNC(RAD.DATA) BETWEEN TRUNC(to_Date($P{P_DATA_FIM},'dd/mm/YYYY')-365,'MONTH') AND to_Date($P{P_DATA_FIM},'dd/mm/YYYY')-365
+AND TRUNC(RAD.DATA) <=  TRUNC(R.DATA_SAIDA)-365
+AND TRUNC(RAD.DATA) >= CD.FRONT_OFFICE
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY trunc(RAD.DATA)
+UNION
+SELECT 'A' TIPO,trunc(MA.DATA_LANCAMENTO) DATA, SUM(MA.VALOR_LANCAMENTO)
+ FROM MOVIMENTO_APARTAMENTO MA
+ JOIN TIPO_LANCAMENTO TL ON  (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO)
+ JOIN CONTROLA_DATA CD ON (MA.ID_HOTEL = CD.ID_HOTEL)
+ WHERE MA.ID_HOTEL = $P{IDH}
+ AND TRUNC(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_Date($P{P_DATA_FIM},'dd/mm/YYYY')-365,'MONTH') AND to_Date($P{P_DATA_FIM},'dd/mm/YYYY')-365
+AND TRUNC(MA.DATA_LANCAMENTO) < CD.FRONT_OFFICE
+ AND TL.ID_IDENTIFICA_LANCAMENTO IN (2,3,26,28)
+ GROUP BY MA.DATA_LANCAMENTO) VR,
+
+
+(SELECT DIAS.DATA DATA, COUNT(RA.ID_RESERVA_APARTAMENTO) DIA
+FROM RESERVA_APARTAMENTO RA
+JOIN RESERVA R ON (RA.ID_RESERVA = R.ID_RESERVA),
+
+(SELECT DATA, TO_CHAR(DATA,'D') DIA
+FROM TABLE(CAST(GETDIAS( TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'),'MONTH'),to_date($P{P_DATA_FIM},'DD/MM/YYYY')-TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'),'MONTH')) AS DATA_OBJTAB))) DIAS
+
+WHERE RA.ID_HOTEL = $P{IDH}
+AND DIAS.DATA BETWEEN trunc(RA.DATA_ENTRADA) AND trunc(RA.DATA_SAIDA-1)
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY DIAS.DATA
+
+UNION
+
+SELECT DIAS.DATA DATA,  COUNT(RA.ID_RESERVA_APARTAMENTO) DIA
+FROM RESERVA_APARTAMENTO RA
+JOIN RESERVA R ON (RA.ID_RESERVA = R.ID_RESERVA),
+
+(SELECT DATA, TO_CHAR(DATA,'D') DIA
+FROM TABLE(CAST(GETDIAS( TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365,'MONTH'),to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365-TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365,'MONTH')) AS DATA_OBJTAB))) DIAS
+
+WHERE RA.ID_HOTEL = $P{IDH}
+AND DIAS.DATA BETWEEN trunc(RA.DATA_ENTRADA) AND trunc(RA.DATA_SAIDA-1)
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY DIAS.DATA) O,
+
+(SELECT COUNT(A.ID_APARTAMENTO) TOTAL
+FROM APARTAMENTO A
+WHERE A.ID_HOTEL=$P{IDH}
+AND A.COFAN='N') APT,
+
+(SELECT DIAS.DATA, COUNT(RA.ID_RESERVA_APARTAMENTO) OCUPADOS
+FROM RESERVA_APARTAMENTO RA
+JOIN RESERVA R ON (RA.ID_RESERVA = R.ID_RESERVA),
+
+(SELECT DATA, TO_CHAR(DATA,'D') DIA
+FROM TABLE(CAST(GETDIAS(TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'),'MONTH'),to_date($P{P_DATA_FIM},'DD/MM/YYYY')-TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'),'MONTH')) AS DATA_OBJTAB))) DIAS
+
+WHERE RA.ID_HOTEL = $P{IDH}
+AND trunc(RA.DATA_ENTRADA) <= DIAS.DATA-1
+AND trunc(RA.DATA_SAIDA) > DIAS.DATA-1
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY DIAS.DATA
+
+UNION
+
+SELECT DIAS.DATA, COUNT(RA.ID_RESERVA_APARTAMENTO) OCUPADOS
+FROM RESERVA_APARTAMENTO RA
+JOIN RESERVA R ON (RA.ID_RESERVA = R.ID_RESERVA),
+
+(SELECT DATA, TO_CHAR(DATA,'D') DIA
+FROM TABLE(CAST(GETDIAS(TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365,'MONTH'),to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365-TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365,'MONTH')) AS DATA_OBJTAB))) DIAS
+
+WHERE RA.ID_HOTEL = $P{IDH}
+AND trunc(RA.DATA_ENTRADA) <= DIAS.DATA-1
+AND trunc(RA.DATA_SAIDA) > DIAS.DATA-1
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY DIAS.DATA
+
+) OC,
+
+(SELECT MES, SUM(TOTALTARIFA) TOTALTARIFA, SUM(OCUPADO_MES) OCUPADO_MES
+FROM
+(SELECT TO_CHAR(MA.DATA_LANCAMENTO,'mm/yyyy')MES,  SUM(MA.VALOR_LANCAMENTO)TOTALTARIFA, SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 3, -1,1)) OCUPADO_MES
+FROM MOVIMENTO_APARTAMENTO MA
+JOIN TIPO_LANCAMENTO TL ON (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO)
+JOIN CONTROLA_DATA CD ON (MA.ID_HOTEL = CD.ID_HOTEL)
+WHERE MA.ID_HOTEL = $P{IDH}
+AND TL.ID_IDENTIFICA_LANCAMENTO IN(2,3,26)
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'), 'MONTH') AND to_date($P{P_DATA_FIM},'DD/MM/YYYY')-1
+GROUP BY TO_CHAR(MA.DATA_LANCAMENTO,'mm/yyyy')
+UNION
+SELECT TO_CHAR(RAD.DATA,'mm/yyyy') MES, SUM(RAD.TARIFA) TOTALTARIFA, COUNT(RAD.ID_RESERVA_APARTAMENTO_DIARIA) OCUPADO_MES
+FROM RESERVA_APARTAMENTO_DIARIA RAD
+JOIN RESERVA_APARTAMENTO RA ON (RAD.ID_RESERVA_APARTAMENTO = RA.ID_RESERVA_APARTAMENTO)
+JOIN RESERVA R ON (RA.ID_RESERVA = R.ID_RESERVA)
+JOIN CONTROLA_DATA CD ON (RA.ID_HOTEL = CD.ID_HOTEL)
+WHERE RA.ID_HOTEL = $P{IDH}
+AND trunc(RAD.DATA) BETWEEN TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'), 'MONTH') AND to_date($P{P_DATA_FIM},'DD/MM/YYYY')-1
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY TO_CHAR(RAD.DATA,'mm/yyyy')
+
+UNION
+
+SELECT TO_CHAR(MA.DATA_LANCAMENTO,'mm/yyyy')MES,  SUM(MA.VALOR_LANCAMENTO)TOTALTARIFA, SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO, 3, -1,1)) OCUPADO_MES
+FROM MOVIMENTO_APARTAMENTO MA
+JOIN TIPO_LANCAMENTO TL ON (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO)
+JOIN CONTROLA_DATA CD ON (MA.ID_HOTEL = CD.ID_HOTEL)
+WHERE MA.ID_HOTEL = $P{IDH}
+AND TL.ID_IDENTIFICA_LANCAMENTO IN(2,3,26)
+AND trunc(MA.DATA_LANCAMENTO) BETWEEN TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY'), 'MONTH') AND to_date($P{P_DATA_FIM},'DD/MM/YYYY')-1
+GROUP BY TO_CHAR(MA.DATA_LANCAMENTO,'mm/yyyy')
+UNION
+SELECT TO_CHAR(RAD.DATA,'mm/yyyy') MES, SUM(RAD.TARIFA) TOTALTARIFA, COUNT(RAD.ID_RESERVA_APARTAMENTO_DIARIA) OCUPADO_MES
+FROM RESERVA_APARTAMENTO_DIARIA RAD
+JOIN RESERVA_APARTAMENTO RA ON (RAD.ID_RESERVA_APARTAMENTO = RA.ID_RESERVA_APARTAMENTO)
+JOIN RESERVA R ON (RA.ID_RESERVA = R.ID_RESERVA)
+JOIN CONTROLA_DATA CD ON (RA.ID_HOTEL = CD.ID_HOTEL)
+WHERE RA.ID_HOTEL = $P{IDH}
+AND trunc(RAD.DATA) BETWEEN TRUNC(to_date($P{P_DATA_FIM},'DD/MM/YYYY')-365, 'MONTH') AND to_date($P{P_DATA_FIM},'DD/MM/YYYY')-366
+AND R.BLOQUEIO = 'N'
+AND R.APAGADA = 'N'
+GROUP BY TO_CHAR(RAD.DATA,'mm/yyyy')
+)
+GROUP BY MES) ACM_MES
+
+WHERE  DIAS.DATA = VR.DATA(+)
+AND DIAS.DATA = O.DATA(+)
+AND DIAS.DATA = OC.DATA(+)
+AND TO_CHAR(DIAS.DATA,'mm/yyyy') = ACM_MES.MES
+order by DIAS.DATA]]>
+	</queryString>
+	<field name="VDIA" class="java.math.BigDecimal"/>
+	<field name="TIPO" class="java.lang.String"/>
+	<field name="DATA" class="java.sql.Timestamp"/>
+	<field name="DIA" class="java.math.BigDecimal"/>
+	<field name="TOTALDIARIA" class="java.math.BigDecimal"/>
+	<field name="DIARIAMEDIA" class="java.math.BigDecimal"/>
+	<field name="PERC_OCUPACAO_DIA" class="java.math.BigDecimal"/>
+	<field name="OCUPADOS" class="java.math.BigDecimal"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="MES" class="java.lang.String"/>
+	<field name="TOTALTARIFA_MES" class="java.math.BigDecimal"/>
+	<field name="DIARIAMEDIA_MES" class="java.math.BigDecimal"/>
+	<field name="TITULO_GRUPO" class="java.lang.String"/>
+	<variable name="OCUP_TOTAL" class="java.lang.Double">
+		<variableExpression><![CDATA[($V{APTO_TOTAL}*100)/($F{TOTAL}.doubleValue() * $F{VDIA}.intValue())]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTALDIARIA_MES" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTALDIARIA}.floatValue()]]></variableExpression>
+	</variable>
+	<variable name="APTO_TOTAL" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{DIA}.intValue()]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<group name="Group Column Header">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+	</group>
+	<group name="Group Column Footer">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupFooter>
+			<band height="50">
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="127" y="1" width="75" height="11"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DIARIAMEDIA_MES}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="202" y="1" width="83" height="11"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TOTALTARIFA_MES}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="1" width="83" height="11"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{TITULO_GRUPO}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="1" y="0" width="573" height="1"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="72" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="572" height="72"/>
+				<subreportParameter name="FRONT_OFFICE">
+					<subreportParameterExpression><![CDATA[$P{FRONT_OFFICE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITULO">
+					<subreportParameterExpression><![CDATA[$P{TITULO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{LOGO_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGO_MOZART">
+					<subreportParameterExpression><![CDATA[$P{LOGO_MOZART}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOME_HOTEL">
+					<subreportParameterExpression><![CDATA[$P{NOME_HOTEL}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TEXT_FIELD">
+					<subreportParameterExpression><![CDATA[$P{TEXT_FIELD}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DIA"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "cabecalhoReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="27" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="13" width="573" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="15" width="37" height="11"/>
+				<textElement textAlignment="Left">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="1" width="46" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ocupação %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="87" y="15" width="24" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="66" y="14" width="20" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="573" height="1"/>
+			</line>
+			<line>
+				<reportElement x="153" y="0" width="1" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Double" lineColor="#FFFFFF"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="116" y="15" width="83" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Diária Média]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="15" width="83" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="1" width="250" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Receita de Diária]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="15" width="83" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Mês]]></text>
+			</staticText>
+			<line>
+				<reportElement x="2" y="24" width="571" height="1"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="9" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="1" y="0" width="54" height="9"/>
+				<textElement textAlignment="Left">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DATA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="65" y="0" width="20" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PERC_OCUPACAO_DIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="89" y="0" width="24" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{OCUP_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="125" y="0" width="75" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIARIAMEDIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="200" y="0" width="83" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTALDIARIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement x="284" y="0" width="83" height="9"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTALDIARIA_MES}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="472" y="2" width="41" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="514" y="2" width="18" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="535" y="2" width="15" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[de]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="553" y="2" width="16" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="1" width="573" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="25">
+			<subreport>
+				<reportElement x="-16" y="0" width="589" height="25"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "noDataReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</noData>
+</jasperReport>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rdsGroupReport4" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="25" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IDH" class="java.lang.String"/>
+	<parameter name="P_DATA" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT /*+ INDEX (checkin IDX_CHECKIN_EM_HO_CK) */
+1 TIPO, ER.NOME_FANTASIA,
+SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,28,NULL,MA.QTDE_ADULTOS))
+-
+SUM(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,MA.QTDE_ADULTOS, 0))QTDE_ADULTOS,
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL,TL.ID_IDENTIFICA_LANCAMENTO)))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,TL.ID_IDENTIFICA_LANCAMENTO,NULL)) ROOM,
+SUM(VALOR_LANCAMENTO)/
+DECODE(
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL,TL.ID_IDENTIFICA_LANCAMENTO)))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,TL.ID_IDENTIFICA_LANCAMENTO,NULL)),0,1,
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL,TL.ID_IDENTIFICA_LANCAMENTO)))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,TL.ID_IDENTIFICA_LANCAMENTO,NULL))) DIARIA_MEDIA,
+ROUND(( (COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,DECODE(TL.ID_IDENTIFICA_LANCAMENTO,28,NULL,TL.ID_IDENTIFICA_LANCAMENTO)))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,TL.ID_IDENTIFICA_LANCAMENTO,NULL))) /DECODE(NVL(TE.TOTAL,1),0,1,NVL(TE.TOTAL,1)) * 100),2) PERCENTUAL,
+SUM(VALOR_LANCAMENTO) DIARIA,
+TE.TOTAL ROOM_TOTAL,
+TT.DIARIA_TOTAL
+
+FROM CHECKIN CK, HOTEL HOT, EMPRESA_REDE ER, MOVIMENTO_APARTAMENTO MA, TIPO_LANCAMENTO TL,
+(SELECT
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,NULL,TL.ID_IDENTIFICA_LANCAMENTO))
+-
+COUNT(DECODE(TL.ID_IDENTIFICA_LANCAMENTO,3,TL.ID_IDENTIFICA_LANCAMENTO,NULL)) TOTAL
+FROM MOVIMENTO_APARTAMENTO MA
+JOIN TIPO_LANCAMENTO TL ON (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (2, 3, 26))
+WHERE MA.ID_HOTEL = $P{IDH}
+AND MA.DATA_LANCAMENTO =  to_date($P{P_DATA},'dd/mm/yyyy')
+) TE,
+(SELECT
+SUM(VALOR_LANCAMENTO) DIARIA_TOTAL
+FROM
+MOVIMENTO_APARTAMENTO MA
+JOIN TIPO_LANCAMENTO TL ON (MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (2, 3, 26,28))
+WHERE MA.ID_HOTEL = $P{IDH}
+AND MA.DATA_LANCAMENTO =  to_date($P{P_DATA},'dd/mm/yyyy')
+) TT
+WHERE MA.ID_HOTEL = $P{IDH}
+AND CK.ID_HOTEL = $P{IDH}
+AND CK.ID_EMPRESA = ER.ID_EMPRESA
+AND CK.ID_CHECKIN = MA.ID_CHECKIN
+AND CK.ID_HOTEL = HOT.ID_HOTEL
+AND MA.ID_TIPO_LANCAMENTO = TL.ID_TIPO_LANCAMENTO
+AND TL.ID_IDENTIFICA_LANCAMENTO IN (2, 3, 26,28)
+AND ER.ID_REDE_HOTEL = HOT.ID_REDE_HOTEL
+AND trunc(MA.DATA_LANCAMENTO) = to_date($P{P_DATA},'dd/mm/yyyy')
+GROUP BY ER.NOME_FANTASIA, TE.TOTAL, TT.DIARIA_TOTAL
+ORDER BY ROOM DESC]]>
+	</queryString>
+	<field name="TIPO" class="java.math.BigDecimal"/>
+	<field name="NOME_FANTASIA" class="java.lang.String"/>
+	<field name="QTDE_ADULTOS" class="java.math.BigDecimal"/>
+	<field name="ROOM" class="java.math.BigDecimal"/>
+	<field name="DIARIA_MEDIA" class="java.math.BigDecimal"/>
+	<field name="PERCENTUAL" class="java.math.BigDecimal"/>
+	<field name="DIARIA" class="java.math.BigDecimal"/>
+	<field name="ROOM_TOTAL" class="java.math.BigDecimal"/>
+	<field name="DIARIA_TOTAL" class="java.math.BigDecimal"/>
+	<variable name="TOTAL_HOSP" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTDE_ADULTOS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_PERC" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{PERCENTUAL}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DIARIA_MEDIA" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{DIARIA_MEDIA}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0)]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DIARIA_CONT" class="java.lang.Double" calculation="Count">
+		<variableExpression><![CDATA[new Double(1)]]></variableExpression>
+	</variable>
+	<group name="rdsGroup">
+		<groupExpression><![CDATA[$F{TIPO}]]></groupExpression>
+		<groupHeader>
+			<band height="19">
+				<staticText>
+					<reportElement x="217" y="4" width="45" height="13"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Hóspede]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="271" y="4" width="62" height="13"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Room Night]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="342" y="4" width="68" height="13"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[% Percentual]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="420" y="4" width="32" height="13"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Diária]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="462" y="4" width="63" height="13"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Diária Média]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="10" y="4" width="124" height="13"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Room Night por Empresa]]></text>
+				</staticText>
+				<line>
+					<reportElement x="1" y="1" width="1" height="18"/>
+				</line>
+				<line>
+					<reportElement x="554" y="1" width="1" height="18"/>
+				</line>
+				<line>
+					<reportElement x="2" y="1" width="552" height="1"/>
+				</line>
+				<line>
+					<reportElement x="2" y="17" width="552" height="1"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="26">
+				<line>
+					<reportElement x="1" y="0" width="554" height="1"/>
+				</line>
+				<staticText>
+					<reportElement x="10" y="3" width="124" height="15"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<line>
+					<reportElement x="1" y="1" width="1" height="17"/>
+				</line>
+				<line>
+					<reportElement x="1" y="18" width="554" height="1"/>
+				</line>
+				<line>
+					<reportElement x="554" y="1" width="1" height="17"/>
+				</line>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="462" y="1" width="63" height="14"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new Double($V{TOTAL_DIARIA_MEDIA}.doubleValue()/$V{TOTAL_DIARIA_CONT}.doubleValue())]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="413" y="2" width="49" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DIARIA_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement x="215" y="3" width="47" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_HOSP}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="288" y="3" width="47" height="15"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ROOM_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="344" y="3" width="63" height="12"/>
+					<textElement textAlignment="Right">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL_PERC}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<line>
+				<reportElement x="554" y="0" width="1" height="15"/>
+			</line>
+			<line>
+				<reportElement x="1" y="0" width="1" height="15"/>
+			</line>
+			<textField>
+				<reportElement x="9" y="0" width="208" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{NOME_FANTASIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="229" y="0" width="37" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{QTDE_ADULTOS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="288" y="0" width="47" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ROOM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="344" y="0" width="65" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{PERCENTUAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="413" y="0" width="49" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DIARIA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="463" y="0" width="62" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{DIARIA_MEDIA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
